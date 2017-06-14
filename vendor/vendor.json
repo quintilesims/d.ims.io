@@ -111,6 +111,18 @@
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
 		{
+			"checksumSHA1": "O6hcK24yI6w7FA+g4Pbr+eQ7pys=",
+			"path": "github.com/aws/aws-sdk-go/private/protocol/json/jsonutil",
+			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
+			"revisionTime": "2017-05-16T20:59:04Z"
+		},
+		{
+			"checksumSHA1": "R00RL5jJXRYq1iiK1+PGvMfvXyM=",
+			"path": "github.com/aws/aws-sdk-go/private/protocol/jsonrpc",
+			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
+			"revisionTime": "2017-05-16T20:59:04Z"
+		},
+		{
 			"checksumSHA1": "ZqY5RWavBLWTo6j9xqdyBEaNFRk=",
 			"path": "github.com/aws/aws-sdk-go/private/protocol/query",
 			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
@@ -137,6 +149,18 @@
 		{
 			"checksumSHA1": "0qYPUga28aQVkxZgBR3Z86AbGUQ=",
 			"path": "github.com/aws/aws-sdk-go/private/protocol/xml/xmlutil",
+			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
+			"revisionTime": "2017-05-16T20:59:04Z"
+		},
+		{
+			"checksumSHA1": "dcUwKQHxD9+ap+/MP9gZ6kT/lXI=",
+			"path": "github.com/aws/aws-sdk-go/service/dynamodb",
+			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
+			"revisionTime": "2017-05-16T20:59:04Z"
+		},
+		{
+			"checksumSHA1": "ljrc0hSykZRMqscr8dtjsMAoZBs=",
+			"path": "github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface",
 			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
@@ -178,11 +202,47 @@
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
 		{
+			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
+			"path": "github.com/gorilla/context",
+			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
+			"revisionTime": "2016-08-17T18:46:32Z"
+		},
+		{
+			"checksumSHA1": "veX5bpYOBjZZWMyWxXxys8EH9d8=",
+			"path": "github.com/gorilla/securecookie",
+			"revision": "fa5329f913702981df43dcb2a380bac429c810b5",
+			"revisionTime": "2016-10-03T05:16:01Z"
+		},
+		{
+			"checksumSHA1": "vYfmVqC/UFKA66ZZdUJsnIcXR4E=",
+			"path": "github.com/gorilla/sessions",
+			"revision": "83c8db3bdc9be789e57e3756ffbcffd2d7d40176",
+			"revisionTime": "2016-12-22T01:33:42Z"
+		},
+		{
 			"checksumSHA1": "0ZrwvB6KoGPj2PoDNSEJwxQ6Mog=",
 			"origin": "github.com/aws/aws-sdk-go/vendor/github.com/jmespath/go-jmespath",
 			"path": "github.com/jmespath/go-jmespath",
 			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
 			"revisionTime": "2017-05-16T20:59:04Z"
+		},
+		{
+			"checksumSHA1": "7cxwOBG3z8bcqlACknqxIV+jB/o=",
+			"path": "github.com/urfave/cli",
+			"revision": "f1be59ff3d239f0942b201619030d302bce912cc",
+			"revisionTime": "2016-11-19T21:37:11Z"
+		},
+		{
+			"checksumSHA1": "57zF9tacJDtrY7Dpnz76C1JVzIY=",
+			"path": "github.com/zpatrick/fireball",
+			"revision": "9fb0836a1d0815a3c4e83fd31c1e75f80a213abd",
+			"revisionTime": "2017-04-10T20:56:13Z"
+		},
+		{
+			"checksumSHA1": "ToPsFeShbYoBMN3uHimpRb536GE=",
+			"path": "github.com/zpatrick/go-plugin-swagger",
+			"revision": "c139ec9f5696a2beeea758f7303b5311f91664c0",
+			"revisionTime": "2017-04-29T20:43:32Z"
 		}
 	],
 	"rootPath": "github.com/quintilesims/d.ims.io"
