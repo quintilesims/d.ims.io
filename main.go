@@ -13,6 +13,7 @@ import (
 	"github.com/zpatrick/fireball"
 	"log"
 	"math/rand"
+	 "github.com/aws/aws-sdk-go/service/ecr"
 	"net/http"
 	"os"
 	"time"
@@ -71,7 +72,7 @@ func main() {
 	}
 
 	app.Action = func(c *cli.Context) error {
-		if err := assertConfig(c); err != nil {
+		if err := validateConfig(c); err != nil {
 			return err
 		}
 
@@ -82,10 +83,13 @@ func main() {
 		config.WithCredentials(staticCreds)
 		config.WithRegion(c.String("aws-region"))
 		session := session.New(config)
+		dynamo := dynamodb.New(session)
+		ecr := ecr.New(session)
 
-		tokenAuth := token.NewDynamoAuth(c.String("dynamo-table"), dynamodb.New(session))
+		tokenAuth := token.NewDynamoAuth(c.String("dynamo-table"), dynamo)
 
 		routes := controllers.NewRootController().Routes()
+		 routes = append(routes, controllers.NewRepositoryController(ecr).Routes()...)
 		routes = append(routes, controllers.NewTokenController(nil, tokenAuth).Routes()...)
 		routes = append(routes, controllers.NewSwaggerController(c.String("swagger-host")).Routes()...)
 		fb := fireball.NewApp(routes)
@@ -104,7 +108,7 @@ func main() {
 	}
 }
 
-func assertConfig(c *cli.Context) error {
+func validateConfig(c *cli.Context) error {
 	vars := map[string]error{
 		"aws-access-key": fmt.Errorf("AWS Access Key not set! (EnvVar: %s)", config.ENVVAR_AWS_ACCESS_KEY),
 		"aws-secret-key": fmt.Errorf("AWS Secret Key not set! (EnvVar: %s)", config.ENVVAR_AWS_SECRET_KEY),

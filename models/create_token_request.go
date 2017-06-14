@@ -9,8 +9,6 @@ type CreateTokenRequest struct{}
 func (r CreateTokenRequest) Definition() swagger.Definition {
 	return swagger.Definition{
 		Type:       "object",
-		Properties: map[string]swagger.Property{
-		//"name": swagger.NewStringProperty(),
-		},
+		Properties: map[string]swagger.Property{},
 	}
 }

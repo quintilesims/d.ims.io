@@ -177,6 +177,18 @@
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
 		{
+			"checksumSHA1": "Lwqoi9aWc+j6dzkgt06LLR7i1XA=",
+			"path": "github.com/aws/aws-sdk-go/service/ecr",
+			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
+			"revisionTime": "2017-05-16T20:59:04Z"
+		},
+		{
+			"checksumSHA1": "cBlx0Bt7+zRvBPWrJblgYtIk/Bk=",
+			"path": "github.com/aws/aws-sdk-go/service/ecr/ecriface",
+			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
+			"revisionTime": "2017-05-16T20:59:04Z"
+		},
+		{
 			"checksumSHA1": "krqUUMDYRN2ohYcumxZl8BTR5EQ=",
 			"path": "github.com/aws/aws-sdk-go/service/s3",
 			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
