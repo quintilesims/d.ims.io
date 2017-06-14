@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/defaults"
-	"github.com/quintilesims/d.ims.io/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/quintilesims/d.ims.io/config"
 	"github.com/quintilesims/d.ims.io/controllers"
 	"github.com/quintilesims/d.ims.io/token"
@@ -80,12 +81,12 @@ func main() {
 		staticCreds := credentials.NewStaticCredentials(c.String("aws-access-key"), c.String("aws-secret-key"), "")
 		config.WithCredentials(staticCreds)
 		config.WithRegion(c.String("aws-region"))
-		aws := aws.NewProvider(config)
+		session := session.New(config)
 
-		dynamo := token.NewDynamoAuth(c.String("dynamo-table"), aws)
+		tokenAuth := token.NewDynamoAuth(c.String("dynamo-table"), dynamodb.New(session))
 
 		routes := controllers.NewRootController().Routes()
-		routes = append(routes, controllers.NewTokenController(nil, dynamo).Routes()...)
+		routes = append(routes, controllers.NewTokenController(nil, tokenAuth).Routes()...)
 		routes = append(routes, controllers.NewSwaggerController(c.String("swagger-host")).Routes()...)
 		fb := fireball.NewApp(routes)
 

@@ -2,26 +2,26 @@ package token
 
 import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/quintilesims/d.ims.io/aws"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 )
 
 type DynamoAuth struct {
-	table string
-	aws   *aws.Provider
+	table  string
+	dynamo dynamodbiface.DynamoDBAPI
 }
 
-func NewDynamoAuth(table string, a *aws.Provider) *DynamoAuth {
+func NewDynamoAuth(table string, d dynamodbiface.DynamoDBAPI) *DynamoAuth {
 	return &DynamoAuth{
-		table: table,
-		aws:   a,
+		table:  table,
+		dynamo: d,
 	}
 }
 
 func (d *DynamoAuth) AddToken(user, token string) error {
 	item := map[string]*dynamodb.AttributeValue{
-		  "User": {
-                        S: &user,
-                },
+		"User": {
+			S: &user,
+		},
 		"Token": {
 			S: &token,
 		},
@@ -31,7 +31,7 @@ func (d *DynamoAuth) AddToken(user, token string) error {
 	input.SetTableName(d.table)
 	input.SetItem(item)
 
-	if _, err := d.aws.DynamoDB.PutItem(input); err != nil {
+	if _, err := d.dynamo.PutItem(input); err != nil {
 		return err
 	}
 
