@@ -34,7 +34,7 @@ data "template_file" "user_policy" {
   template = "${file("${path.module}/user_policy.json")}"
 
   vars {
-    region = "${var.region}"
+    region     = "${var.region}"
     account_id = "${data.aws_caller_identity.current.account_id}"
     repository = "${aws_ecr_repository.mod.name}"
   }

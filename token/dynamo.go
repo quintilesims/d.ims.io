@@ -31,6 +31,10 @@ func (d *DynamoAuth) AddToken(user, token string) error {
 	input.SetTableName(d.table)
 	input.SetItem(item)
 
+	if err := input.Validate(); err != nil {
+		return err
+	}
+
 	if _, err := d.dynamo.PutItem(input); err != nil {
 		return err
 	}
