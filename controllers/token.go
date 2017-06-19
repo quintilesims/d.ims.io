@@ -3,22 +3,19 @@ package controllers
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/quintilesims/d.ims.io/auth0"
+	"github.com/quintilesims/d.ims.io/auth/token"
 	"github.com/quintilesims/d.ims.io/models"
-	"github.com/quintilesims/d.ims.io/token"
 	"github.com/zpatrick/fireball"
 	"math/rand"
 )
 
 type TokenController struct {
-	auth0Auth auth0.Authenticator
-	tokenAuth token.Authenticator
+	tokenManager token.TokenManager
 }
 
-func NewTokenController(a auth0.Authenticator, t token.Authenticator) *TokenController {
+func NewTokenController(t token.TokenManager) *TokenController {
 	return &TokenController{
-		auth0Auth: a,
-		tokenAuth: t,
+		tokenManager: t,
 	}
 }
 
@@ -40,7 +37,7 @@ func (t *TokenController) CreateToken(c *fireball.Context) (fireball.Response, e
 	raw := fmt.Sprintf("%s:%s", randomString(26), randomString(26))
 	token := base64.StdEncoding.EncodeToString([]byte(raw))
 
-	if err := t.tokenAuth.AddToken("test", token); err != nil {
+	if err := t.tokenManager.AddToken("test", token); err != nil {
 		return nil, err
 	}
 

@@ -67,29 +67,29 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 					},
 				},
 			},
-			 "/repository": map[string]swagger.Method{
-                                "post": {
-                                        Tags:     []string{"Repository"},
-                                        Summary:  "Create a new Repository",
-                                        Security: swagger.BasicAuthSecurity("login"),
-                                        Parameters: []swagger.Parameter{
-                                                swagger.NewBodyParam("CreateRepositoryRequest", "none", true),
-                                        },
-                                        Responses: map[string]swagger.Response{
-                                                "200": {
-                                                        Description: "success",
-                                                        Schema:      swagger.NewObjectSchema("CreateRepositoryResponse"),
-                                                },
-                                        },
-                                },
-                        },
+			"/repository": map[string]swagger.Method{
+				"post": {
+					Tags:     []string{"Repository"},
+					Summary:  "Create a new Repository",
+					Security: swagger.BasicAuthSecurity("login"),
+					Parameters: []swagger.Parameter{
+						swagger.NewBodyParam("CreateRepositoryRequest", "none", true),
+					},
+					Responses: map[string]swagger.Response{
+						"200": {
+							Description: "success",
+							Schema:      swagger.NewObjectSchema("CreateRepositoryResponse"),
+						},
+					},
+				},
+			},
 		},
 		Definitions: map[string]swagger.Definition{
-			"CreateRepositoryRequest": models.CreateRepositoryRequest{}.Definition(),
+			"CreateRepositoryRequest":  models.CreateRepositoryRequest{}.Definition(),
 			"CreateRepositoryResponse": models.CreateRepositoryResponse{}.Definition(),
-			"CreateTokenRequest":      models.CreateTokenRequest{}.Definition(),
-			"CreateTokenResponse":     models.CreateTokenResponse{}.Definition(),
-			"Repository":              models.Repository{}.Definition(),
+			"CreateTokenRequest":       models.CreateTokenRequest{}.Definition(),
+			"CreateTokenResponse":      models.CreateTokenResponse{}.Definition(),
+			"Repository":               models.Repository{}.Definition(),
 		},
 		SecurityDefinitions: map[string]swagger.SecurityDefinition{
 			"login": {
