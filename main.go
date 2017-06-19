@@ -93,9 +93,11 @@ func main() {
 		auth := auth.NewCompositeAuthenticator(adManager, tokenManager)
 
 		routes := controllers.NewRootController().Routes()
-		routes = append(routes, controllers.NewRepositoryController(auth, ecr).Routes()...)
+		routes = append(routes, controllers.NewRepositoryController(ecr).Routes()...)
 		routes = append(routes, controllers.NewTokenController(tokenManager).Routes()...)
 		routes = append(routes, controllers.NewSwaggerController(c.String("swagger-host")).Routes()...)
+		
+		routes = fireball.Decorate(routes, controllers.AuthDecorator(auth))
 		fb := fireball.NewApp(routes)
 
 		port := fmt.Sprintf(":%s", c.String("port"))

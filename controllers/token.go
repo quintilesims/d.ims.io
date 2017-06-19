@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/quintilesims/d.ims.io/auth/token"
 	"github.com/quintilesims/d.ims.io/models"
 	"github.com/zpatrick/fireball"
@@ -29,13 +28,7 @@ func (r *TokenController) Routes() []*fireball.Route {
 }
 
 func (t *TokenController) CreateToken(c *fireball.Context) (fireball.Response, error) {
-	// todo: auth0 auth
-	user, _, ok := c.Request.BasicAuth()
-	if !ok {
-		// todo: use stnadard unauthorized response
-		return nil, fmt.Errorf("Must pass auth")
-	}
-
+	user, _, _ := c.Request.BasicAuth()
 	token, err := t.tokenManager.GenerateToken(user)
 	if err != nil {
 		return nil, err
