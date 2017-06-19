@@ -1,23 +1,19 @@
 package controllers
 
 import (
-	"fmt"
 	"encoding/json"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
-	"github.com/quintilesims/d.ims.io/auth"
 	"github.com/quintilesims/d.ims.io/models"
 	"github.com/zpatrick/fireball"
 )
 
 type RepositoryController struct {
-	auth auth.Authenticator
 	ecr  ecriface.ECRAPI
 }
 
-func NewRepositoryController(a auth.Authenticator, e ecriface.ECRAPI) *RepositoryController {
+func NewRepositoryController(e ecriface.ECRAPI) *RepositoryController {
 	return &RepositoryController{
-		auth: a,
 		ecr:  e,
 	}
 }
@@ -42,8 +38,6 @@ func (r *RepositoryController) Routes() []*fireball.Route {
 }
 
 func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.Response, error) {
-	// todo: auth
-
 	var req models.CreateRepositoryRequest
 	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
 		return nil, err
@@ -64,8 +58,6 @@ func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.R
 }
 
 func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Response, error) {
-	// todo: auth
-
 	name := c.PathVariables["name"]
 	describeReposInput := &ecr.DescribeRepositoriesInput{}
 	describeReposInput.SetRepositoryNames([]*string{&name})
@@ -111,7 +103,6 @@ func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Resp
 }
 
 func (r *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.Response, error) {
-	// todo: auth
 	name := c.PathVariables["name"]
 	input := &ecr.DeleteRepositoryInput{}
 	input.SetRepositoryName(name)
@@ -129,16 +120,6 @@ func (r *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.R
 }
 
 func (r *RepositoryController) ListRepositories(c *fireball.Context) (fireball.Response, error) {
-	isAuthenticated, err := r.auth.Authenticate(c.Request)
-	if err != nil {
-		return nil, err
-	}
-
-	// todo: use standard invalid resp
-	if !isAuthenticated {
-		return nil, fmt.Errorf("INvalid auth")
-	}
-
 	input := &ecr.DescribeRepositoriesInput{}
 	if err := input.Validate(); err != nil {
 		return nil, err
