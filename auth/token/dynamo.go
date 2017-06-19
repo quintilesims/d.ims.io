@@ -3,9 +3,10 @@ package token
 import (
 	"encoding/base64"
 	"fmt"
+	"math/rand"
+
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
-	"math/rand"
 )
 
 type DynamoTokenManager struct {
@@ -46,6 +47,27 @@ func (d *DynamoTokenManager) GenerateToken(user string) (string, error) {
 	}
 
 	return token, nil
+}
+
+func (d *DynamoTokenManager) DeleteToken(token string) error {
+	key := map[string]*dynamodb.AttributeValue{
+		"Token": {
+			S: &token,
+		},
+	}
+	input := &dynamodb.DeleteItemInput{}
+	input.SetTableName(d.table)
+	input.SetKey(key)
+
+	if err := input.Validate(); err != nil {
+		return err
+	}
+
+	if _, err := d.dynamo.DeleteItem(input); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (d *DynamoTokenManager) Authenticate(user, pass string) (bool, error) {

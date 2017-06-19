@@ -24,6 +24,12 @@ func (r *TokenController) Routes() []*fireball.Route {
 				"POST": r.CreateToken,
 			},
 		},
+		{
+			Path: "/token/:token",
+			Handlers: fireball.Handlers{
+				"DELETE": r.DeleteToken,
+			},
+		},
 	}
 }
 
@@ -35,4 +41,14 @@ func (t *TokenController) CreateToken(c *fireball.Context) (fireball.Response, e
 	}
 
 	return fireball.NewJSONResponse(200, models.CreateTokenResponse{Token: token})
+}
+
+func (t *TokenController) DeleteToken(c *fireball.Context) (fireball.Response, error) {
+	tk := c.PathVariables["token"]
+
+	if err := t.tokenManager.DeleteToken(tk); err != nil {
+		return nil, err
+	}
+
+	return fireball.NewResponse(200, []byte("Deleted token."), nil), nil
 }
