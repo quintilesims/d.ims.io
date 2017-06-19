@@ -7,6 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/ecr"
+	"github.com/quintilesims/d.ims.io/auth"
+	"github.com/quintilesims/d.ims.io/auth/auth0"
 	"github.com/quintilesims/d.ims.io/auth/token"
 	"github.com/quintilesims/d.ims.io/config"
 	"github.com/quintilesims/d.ims.io/controllers"
@@ -87,9 +89,11 @@ func main() {
 		ecr := ecr.New(session)
 
 		tokenManager := token.NewDynamoTokenManager(c.String("dynamo-table"), dynamo)
+		adManager := auth0.NewClient()
+		auth := auth.NewCompositeAuthenticator(adManager, tokenManager)
 
 		routes := controllers.NewRootController().Routes()
-		routes = append(routes, controllers.NewRepositoryController(ecr).Routes()...)
+		routes = append(routes, controllers.NewRepositoryController(auth, ecr).Routes()...)
 		routes = append(routes, controllers.NewTokenController(tokenManager).Routes()...)
 		routes = append(routes, controllers.NewSwaggerController(c.String("swagger-host")).Routes()...)
 		fb := fireball.NewApp(routes)

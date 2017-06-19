@@ -1,5 +1,9 @@
 package auth
 
+import (
+	"net/http"
+)
+
 type Authenticator interface {
-	Authenticate(username, password string) (bool, error)
+	Authenticate(*http.Request) (bool, error)
 }
