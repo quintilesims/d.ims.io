@@ -68,6 +68,17 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 				},
 			},
 			"/repository": map[string]swagger.Method{
+				"get": {
+					Tags:     []string{"Repository"},
+					Summary:  "List all Repositories",
+					Security: swagger.BasicAuthSecurity("login"),
+					Responses: map[string]swagger.Response{
+						"200": {
+							Description: "success",
+							Schema:      swagger.NewObjectSchema("ListRepositoriesResponse"),
+						},
+					},
+				},
 				"post": {
 					Tags:     []string{"Repository"},
 					Summary:  "Create a new Repository",
@@ -83,12 +94,42 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 					},
 				},
 			},
+			"/repository/{name}": map[string]swagger.Method{
+				"delete": {
+					Tags:     []string{"Repository"},
+					Summary:  "Delete a Repository",
+					Security: swagger.BasicAuthSecurity("login"),
+					Parameters: []swagger.Parameter{
+						swagger.NewStringPathParam("name", "Name of the respository to delete", true),
+					},
+					Responses: map[string]swagger.Response{
+						"200": {
+							Description: "success",
+						},
+					},
+				},
+				"get": {
+					Tags:     []string{"Repository"},
+					Summary:  "Describe a Repository",
+					Security: swagger.BasicAuthSecurity("login"),
+					Parameters: []swagger.Parameter{
+						swagger.NewStringPathParam("name", "Name of the respository to describe", true),
+					},
+					Responses: map[string]swagger.Response{
+						"200": {
+							Description: "success",
+							Schema:      swagger.NewObjectSchema("Repository"),
+						},
+					},
+				},
+			},
 		},
 		Definitions: map[string]swagger.Definition{
 			"CreateRepositoryRequest":  models.CreateRepositoryRequest{}.Definition(),
 			"CreateRepositoryResponse": models.CreateRepositoryResponse{}.Definition(),
 			"CreateTokenRequest":       models.CreateTokenRequest{}.Definition(),
 			"CreateTokenResponse":      models.CreateTokenResponse{}.Definition(),
+			"ListRepositoriesResponse": models.ListRepositoriesResponse{}.Definition(),
 			"Repository":               models.Repository{}.Definition(),
 		},
 		SecurityDefinitions: map[string]swagger.SecurityDefinition{

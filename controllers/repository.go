@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
 	"github.com/quintilesims/d.ims.io/models"
@@ -38,7 +37,7 @@ func (r *RepositoryController) Routes() []*fireball.Route {
 	}
 }
 
-func (t *RepositoryController) CreateRepository(c *fireball.Context) (fireball.Response, error) {
+func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.Response, error) {
 	// todo: auth
 
 	var req models.CreateRepositoryRequest
@@ -53,24 +52,96 @@ func (t *RepositoryController) CreateRepository(c *fireball.Context) (fireball.R
 		return nil, err
 	}
 
-	if _, err := t.ecr.CreateRepository(input); err != nil {
+	if _, err := r.ecr.CreateRepository(input); err != nil {
 		return nil, err
 	}
 
 	return fireball.NewJSONResponse(202, models.CreateRepositoryResponse{Name: req.Name})
 }
 
-func (t *RepositoryController) GetRepository(c *fireball.Context) (fireball.Response, error) {
+func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Response, error) {
 	// todo: auth
-	return nil, fmt.Errorf("Not implemented")
+
+	name := c.PathVariables["name"]
+	describeReposInput := &ecr.DescribeRepositoriesInput{}
+	describeReposInput.SetRepositoryNames([]*string{&name})
+	if err := describeReposInput.Validate(); err != nil {
+		return nil, err
+	}
+
+	describeReposOutput, err := r.ecr.DescribeRepositories(describeReposInput)
+	if err != nil {
+		return nil, err
+	}
+
+	repository := describeReposOutput.Repositories[0]
+
+	describeImagesInput := &ecr.DescribeImagesInput{}
+	describeImagesInput.SetRepositoryName(name)
+	if err := describeImagesInput.Validate(); err != nil {
+		return nil, err
+	}
+
+	tags := []string{}
+	fn := func(output *ecr.DescribeImagesOutput, lastPage bool) bool {
+		for _, image := range output.ImageDetails {
+			for _, tag := range image.ImageTags {
+				tags = append(tags, *tag)
+			}
+		}
+
+		return !lastPage
+	}
+
+	if err := r.ecr.DescribeImagesPages(describeImagesInput, fn); err != nil {
+		return nil, err
+	}
+
+	resp := models.Repository{
+		Name:      *repository.RepositoryName,
+		URI:       *repository.RepositoryUri,
+		ImageTags: tags,
+	}
+
+	return fireball.NewJSONResponse(200, resp)
 }
 
-func (t *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.Response, error) {
+func (r *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.Response, error) {
 	// todo: auth
-	return nil, fmt.Errorf("Not implemented")
+	name := c.PathVariables["name"]
+	input := &ecr.DeleteRepositoryInput{}
+	input.SetRepositoryName(name)
+	input.SetForce(true)
+
+	if err := input.Validate(); err != nil {
+		return nil, err
+	}
+
+	if _, err := r.ecr.DeleteRepository(input); err != nil {
+		return nil, err
+	}
+
+	return fireball.NewJSONResponse(200, nil)
 }
 
-func (t *RepositoryController) ListRepositories(c *fireball.Context) (fireball.Response, error) {
-	// todo: auth
-	return nil, fmt.Errorf("Not implemented")
+func (r *RepositoryController) ListRepositories(c *fireball.Context) (fireball.Response, error) {
+	input := &ecr.DescribeRepositoriesInput{}
+	if err := input.Validate(); err != nil {
+		return nil, err
+	}
+
+	repositories := []string{}
+	fn := func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
+		for _, repository := range output.Repositories {
+			repositories = append(repositories, *repository.RepositoryName)
+		}
+
+		return !lastPage
+	}
+
+	if err := r.ecr.DescribeRepositoriesPages(input, fn); err != nil {
+		return nil, err
+	}
+
+	return fireball.NewJSONResponse(200, models.ListRepositoriesResponse{Repositories: repositories})
 }
