@@ -5,14 +5,18 @@ import (
 )
 
 type Repository struct {
-	Name string `json:"name"`
+	Name      string   `json:"name"`
+	URI       string   `json:"uri"`
+	ImageTags []string `json:"image_tags"`
 }
 
 func (r Repository) Definition() swagger.Definition {
 	return swagger.Definition{
 		Type: "object",
 		Properties: map[string]swagger.Property{
-			"name": swagger.NewStringProperty(),
+			"name":       swagger.NewStringProperty(),
+			"uri":        swagger.NewStringProperty(),
+			"image_tags": swagger.NewStringSliceProperty(),
 		},
 	}
 }
