@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"fmt"
 	"encoding/json"
-	"github.com/quintilesims/d.ims.io/models"
-	"github.com/zpatrick/fireball"
+	"fmt"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
+	"github.com/quintilesims/d.ims.io/models"
+	"github.com/zpatrick/fireball"
 )
 
 type RepositoryController struct {
@@ -56,7 +56,7 @@ func (t *RepositoryController) CreateRepository(c *fireball.Context) (fireball.R
 	if _, err := t.ecr.CreateRepository(input); err != nil {
 		return nil, err
 	}
-	
+
 	return fireball.NewJSONResponse(202, models.CreateRepositoryResponse{Name: req.Name})
 }
 

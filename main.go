@@ -6,14 +6,14 @@ import (
 	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/ecr"
+	"github.com/quintilesims/d.ims.io/auth/token"
 	"github.com/quintilesims/d.ims.io/config"
 	"github.com/quintilesims/d.ims.io/controllers"
-	"github.com/quintilesims/d.ims.io/token"
 	"github.com/urfave/cli"
 	"github.com/zpatrick/fireball"
 	"log"
 	"math/rand"
-	 "github.com/aws/aws-sdk-go/service/ecr"
 	"net/http"
 	"os"
 	"time"
@@ -86,11 +86,11 @@ func main() {
 		dynamo := dynamodb.New(session)
 		ecr := ecr.New(session)
 
-		tokenAuth := token.NewDynamoAuth(c.String("dynamo-table"), dynamo)
+		tokenManager := token.NewDynamoTokenManager(c.String("dynamo-table"), dynamo)
 
 		routes := controllers.NewRootController().Routes()
-		 routes = append(routes, controllers.NewRepositoryController(ecr).Routes()...)
-		routes = append(routes, controllers.NewTokenController(nil, tokenAuth).Routes()...)
+		routes = append(routes, controllers.NewRepositoryController(ecr).Routes()...)
+		routes = append(routes, controllers.NewTokenController(tokenManager).Routes()...)
 		routes = append(routes, controllers.NewSwaggerController(c.String("swagger-host")).Routes()...)
 		fb := fireball.NewApp(routes)
 

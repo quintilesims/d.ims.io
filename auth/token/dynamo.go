@@ -5,19 +5,19 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 )
 
-type DynamoAuth struct {
+type DynamoTokenManager struct {
 	table  string
 	dynamo dynamodbiface.DynamoDBAPI
 }
 
-func NewDynamoAuth(table string, d dynamodbiface.DynamoDBAPI) *DynamoAuth {
-	return &DynamoAuth{
+func NewDynamoTokenManager(table string, d dynamodbiface.DynamoDBAPI) *DynamoTokenManager {
+	return &DynamoTokenManager{
 		table:  table,
 		dynamo: d,
 	}
 }
 
-func (d *DynamoAuth) AddToken(user, token string) error {
+func (d *DynamoTokenManager) AddToken(user, token string) error {
 	item := map[string]*dynamodb.AttributeValue{
 		"User": {
 			S: &user,
@@ -42,6 +42,6 @@ func (d *DynamoAuth) AddToken(user, token string) error {
 	return nil
 }
 
-func (d *DynamoAuth) Authenticate(token string) error {
+func (d *DynamoTokenManager) Authenticate(token string) error {
 	return nil
 }
