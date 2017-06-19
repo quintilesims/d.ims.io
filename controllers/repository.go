@@ -1,20 +1,24 @@
 package controllers
 
 import (
+	"fmt"
 	"encoding/json"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
+	"github.com/quintilesims/d.ims.io/auth"
 	"github.com/quintilesims/d.ims.io/models"
 	"github.com/zpatrick/fireball"
 )
 
 type RepositoryController struct {
-	ecr ecriface.ECRAPI
+	auth auth.Authenticator
+	ecr  ecriface.ECRAPI
 }
 
-func NewRepositoryController(e ecriface.ECRAPI) *RepositoryController {
+func NewRepositoryController(a auth.Authenticator, e ecriface.ECRAPI) *RepositoryController {
 	return &RepositoryController{
-		ecr: e,
+		auth: a,
+		ecr:  e,
 	}
 }
 
@@ -125,6 +129,16 @@ func (r *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.R
 }
 
 func (r *RepositoryController) ListRepositories(c *fireball.Context) (fireball.Response, error) {
+	isAuthenticated, err := r.auth.Authenticate(c.Request)
+	if err != nil {
+		return nil, err
+	}
+
+	// todo: use standard invalid resp
+	if !isAuthenticated {
+		return nil, fmt.Errorf("INvalid auth")
+	}
+
 	input := &ecr.DescribeRepositoriesInput{}
 	if err := input.Validate(); err != nil {
 		return nil, err
