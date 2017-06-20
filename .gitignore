@@ -1,0 +1,4 @@
+.terraform
+terraform.tf*
+d.ims.io
+*.swp
