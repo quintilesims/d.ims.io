@@ -13,8 +13,8 @@ func newTestAuthenticator(isValid bool, err error) AuthenticatorFunc {
 func TestCompositeAuthenticator(t *testing.T) {
 	cases := []struct {
 		Name           string
-		Authenticators []Authenticator
 		ExpectedResult bool
+		Authenticators []Authenticator
 	}{
 		{
 			Name:           "empty",
