@@ -5,23 +5,15 @@ import (
 	"net/http"
 )
 
-type Router struct {
-	router  *fireball.BasicRouter
-	doProxy fireball.Handler
-}
+func NewRouter(routes []*fireball.Route, doProxy fireball.Handler) fireball.RouterFunc {
+	router := fireball.NewBasicRouter(routes)
 
-func NewRouter(routes []*fireball.Route, doProxy fireball.Handler) *Router {
-	return &Router{
-		router:  fireball.NewBasicRouter(routes),
-		doProxy: doProxy,
-	}
-}
+	return fireball.RouterFunc(func(req *http.Request) (*fireball.RouteMatch, error) {
+		match, err := router.Match(req)
+		if match != nil || err != nil {
+			return match, err
+		}
 
-func (r *Router) Match(req *http.Request) (*fireball.RouteMatch, error) {
-	match, err := r.router.Match(req)
-	if match != nil || err != nil {
-		return match, err
-	}
-
-	return &fireball.RouteMatch{Handler: r.doProxy}, nil
+		return &fireball.RouteMatch{Handler: doProxy}, nil
+	})
 }

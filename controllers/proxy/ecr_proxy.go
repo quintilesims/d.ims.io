@@ -6,22 +6,14 @@ import (
 	"net/url"
 )
 
-type ECRProxy struct {
-	endpoint     string
-	reverseProxy *httputil.ReverseProxy
-}
+func NewECRProxy(registryEndpoint string) ProxyFunc {
+	reverseProxy := httputil.NewSingleHostReverseProxy(&url.URL{
+		Host:   registryEndpoint,
+		Scheme: "https",
+	})
 
-func NewECRProxy(endpoint string) *ECRProxy {
-	return &ECRProxy{
-		endpoint: endpoint,
-		reverseProxy: httputil.NewSingleHostReverseProxy(&url.URL{
-			Host:   endpoint,
-			Scheme: "https",
-		}),
-	}
-}
-
-func (e *ECRProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	r.Host = e.endpoint
-	e.reverseProxy.ServeHTTP(w, r)
+	return ProxyFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Host = registryEndpoint
+		reverseProxy.ServeHTTP(w, r)
+	})
 }
