@@ -4,12 +4,14 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
-	"github.com/quintilesims/d.ims.io/controllers/proxy"
-	"github.com/zpatrick/fireball"
-	"github.com/zpatrick/go-cache"
+
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/quintilesims/d.ims.io/controllers/proxy"
+	"github.com/zpatrick/fireball"
+	"github.com/zpatrick/go-cache"
 )
 
 // ecr tokens last for 12 hours: https://github.com/aws/aws-sdk-go/blob/master/service/ecr/api.go#L1022
@@ -32,7 +34,7 @@ func NewProxyController(ecr ecriface.ECRAPI, p proxy.Proxy) *ProxyController {
 func (p *ProxyController) DoProxy(c *fireball.Context) (fireball.Response, error) {
 	token, err := p.getRegistryAuthToken()
 	if err != nil {
-		log.Printf("[ERROR] Failed to get token for reverse proxy: %v", err)
+		log.Printf("[ERROR] Failed to get auth token for registry: %v", err)
 		return nil, err
 	}
 

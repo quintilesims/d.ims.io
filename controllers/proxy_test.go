@@ -1,13 +1,14 @@
 package controllers
 
 import (
+	"net/http"
+	"testing"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/golang/mock/gomock"
 	"github.com/quintilesims/d.ims.io/controllers/proxy"
 	"github.com/quintilesims/d.ims.io/mock"
-	"net/http"
-	"testing"
 )
 
 func TestProxy(t *testing.T) {

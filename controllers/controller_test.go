@@ -3,9 +3,10 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/zpatrick/fireball"
 	"net/http"
 	"testing"
+
+	"github.com/zpatrick/fireball"
 )
 
 func generateContext(t *testing.T, v interface{}, pathVariables map[string]string) *fireball.Context {

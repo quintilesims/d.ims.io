@@ -1,8 +1,9 @@
 package router
 
 import (
-	"github.com/zpatrick/fireball"
 	"net/http"
+
+	"github.com/zpatrick/fireball"
 )
 
 func NewRouter(routes []*fireball.Route, doProxy fireball.Handler) fireball.RouterFunc {

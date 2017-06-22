@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+
 	"github.com/quintilesims/d.ims.io/auth"
 	"github.com/zpatrick/fireball"
 )

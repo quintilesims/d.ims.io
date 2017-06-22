@@ -1,12 +1,13 @@
 package controllers
 
 import (
+	"testing"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/golang/mock/gomock"
 	"github.com/quintilesims/d.ims.io/mock"
 	"github.com/quintilesims/d.ims.io/models"
-	"testing"
 )
 
 func TestCreateRepository(t *testing.T) {
