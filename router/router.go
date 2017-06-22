@@ -1,9 +1,10 @@
 package router
 
 import (
+	"net/http"
+
 	"github.com/quintilesims/d.ims.io/controllers"
 	"github.com/zpatrick/fireball"
-	"net/http"
 )
 
 type Router struct {

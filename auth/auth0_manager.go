@@ -1,8 +1,9 @@
 package auth
 
 import (
-	"github.com/zpatrick/rclient"
 	"log"
+
+	"github.com/zpatrick/rclient"
 )
 
 type Auth0Manager struct {
