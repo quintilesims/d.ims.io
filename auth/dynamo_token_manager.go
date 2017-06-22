@@ -54,6 +54,7 @@ func (d *DynamoTokenManager) DeleteToken(token string) error {
 			S: &token,
 		},
 	}
+
 	input := &dynamodb.DeleteItemInput{}
 	input.SetTableName(d.table)
 	input.SetKey(key)

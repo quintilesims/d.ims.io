@@ -1,9 +1,8 @@
 package controllers
 
 import (
-	"fmt"
-
 	"github.com/quintilesims/d.ims.io/auth"
+	"github.com/quintilesims/d.ims.io/models"
 	"github.com/zpatrick/fireball"
 )
 
@@ -17,22 +16,42 @@ func NewTokenController(t auth.TokenManager) *TokenController {
 	}
 }
 
-func (r *TokenController) Routes() []*fireball.Route {
+func (t *TokenController) Routes() []*fireball.Route {
 	return []*fireball.Route{
 		{
 			Path: "/token",
 			Handlers: fireball.Handlers{
-				"DELETE": r.DeleteToken,
-				"POST":   r.CreateToken,
+				"POST": t.CreateToken,
+			},
+		},
+		{
+			Path: "/token/:token",
+			Handlers: fireball.Handlers{
+				"DELETE": t.DeleteToken,
 			},
 		},
 	}
 }
 
-func (r *TokenController) CreateToken(c *fireball.Context) (fireball.Response, error) {
-	return nil, fmt.Errorf("Not implemented")
+func (t *TokenController) CreateToken(c *fireball.Context) (fireball.Response, error) {
+	user, _, _ := c.Request.BasicAuth()
+	token, err := t.tokenManager.CreateToken(user)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := models.CreateTokenResponse{
+		Token: token,
+	}
+
+	return fireball.NewJSONResponse(202, resp)
 }
 
-func (r *TokenController) DeleteToken(c *fireball.Context) (fireball.Response, error) {
-	return nil, fmt.Errorf("Not implemented")
+func (t *TokenController) DeleteToken(c *fireball.Context) (fireball.Response, error) {
+	token := c.PathVariables["token"]
+	if err := t.tokenManager.DeleteToken(token); err != nil {
+		return nil, err
+	}
+
+	return fireball.NewResponse(200, []byte("Successfully deleted token"), nil), nil
 }

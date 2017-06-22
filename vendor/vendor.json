@@ -221,10 +221,10 @@
 			"revisionTime": "2017-04-29T20:43:32Z"
 		},
 		{
-			"checksumSHA1": "vWRltn86dBjcd3cXvXqYPV/Y+xE=",
+			"checksumSHA1": "YLTesJKrzaqi/LDrtImc/O4JX94=",
 			"path": "github.com/zpatrick/rclient",
-			"revision": "970d4b3fda75b6144a9ff60ae9bfd4a6c752e7d5",
-			"revisionTime": "2017-06-21T22:46:25Z"
+			"revision": "c0b4afdd3d7f5bbb8f22474465f973d19734a66e",
+			"revisionTime": "2017-06-22T21:53:04Z"
 		}
 	],
 	"rootPath": "github.com/quintilesims/d.ims.io"
