@@ -16,7 +16,7 @@ func TestCreateRepository(t *testing.T) {
 	mockECR := mock.NewMockECRAPI(ctrl)
 	controller := NewRepositoryController(mockECR)
 
-	validateCreateRepositoryRequest := func(input *ecr.CreateRepositoryInput) {
+	validateCreateRepositoryInput := func(input *ecr.CreateRepositoryInput) {
 		if v, want := aws.StringValue(input.RepositoryName), "test"; v != want {
 			t.Errorf("Name was '%v', expected '%v'", v, want)
 		}
@@ -24,7 +24,7 @@ func TestCreateRepository(t *testing.T) {
 
 	mockECR.EXPECT().
 		CreateRepository(gomock.Any()).
-		Do(validateCreateRepositoryRequest).
+		Do(validateCreateRepositoryInput).
 		Return(&ecr.CreateRepositoryOutput{}, nil)
 
 	c := generateContext(t, models.CreateRepositoryRequest{Name: "test"}, nil)
@@ -40,7 +40,7 @@ func TestDeleteRepository(t *testing.T) {
 	mockECR := mock.NewMockECRAPI(ctrl)
 	controller := NewRepositoryController(mockECR)
 
-	validateDeleteRepositoryRequest := func(input *ecr.DeleteRepositoryInput) {
+	validateDeleteRepositoryInput := func(input *ecr.DeleteRepositoryInput) {
 		if v, want := aws.StringValue(input.RepositoryName), "test"; v != want {
 			t.Errorf("Name was '%v', expected '%v'", v, want)
 		}
@@ -52,7 +52,7 @@ func TestDeleteRepository(t *testing.T) {
 
 	mockECR.EXPECT().
 		DeleteRepository(gomock.Any()).
-		Do(validateDeleteRepositoryRequest).
+		Do(validateDeleteRepositoryInput).
 		Return(&ecr.DeleteRepositoryOutput{}, nil)
 
 	c := generateContext(t, nil, map[string]string{"name": "test"})
@@ -68,7 +68,7 @@ func TestGetRepository(t *testing.T) {
 	mockECR := mock.NewMockECRAPI(ctrl)
 	controller := NewRepositoryController(mockECR)
 
-	validateDescribeImagesRequest := func(input *ecr.DescribeImagesInput, fn func(*ecr.DescribeImagesOutput, bool) bool) {
+	validateDescribeImagesInput := func(input *ecr.DescribeImagesInput, fn func(*ecr.DescribeImagesOutput, bool) bool) {
 		if v, want := aws.StringValue(input.RepositoryName), "test"; v != want {
 			t.Errorf("Name was '%v', expected '%v'", v, want)
 		}
@@ -76,7 +76,7 @@ func TestGetRepository(t *testing.T) {
 
 	mockECR.EXPECT().
 		DescribeImagesPages(gomock.Any(), gomock.Any()).
-		Do(validateDescribeImagesRequest).
+		Do(validateDescribeImagesInput).
 		Return(nil)
 
 	c := generateContext(t, nil, map[string]string{"name": "test"})
@@ -92,13 +92,13 @@ func TestListRepositories(t *testing.T) {
 	mockECR := mock.NewMockECRAPI(ctrl)
 	controller := NewRepositoryController(mockECR)
 
-	validateDescribeRepositoriesRequest := func(input *ecr.DescribeRepositoriesInput, fn func(*ecr.DescribeRepositoriesOutput, bool) bool) {
+	validateDescribeRepositoriesInput := func(input *ecr.DescribeRepositoriesInput, fn func(*ecr.DescribeRepositoriesOutput, bool) bool) {
 		// no fields to validate
 	}
 
 	mockECR.EXPECT().
 		DescribeRepositoriesPages(gomock.Any(), gomock.Any()).
-		Do(validateDescribeRepositoriesRequest).
+		Do(validateDescribeRepositoriesInput).
 		Return(nil)
 
 	c := generateContext(t, nil, nil)

@@ -46,7 +46,6 @@ func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.R
 
 	input := &ecr.CreateRepositoryInput{}
 	input.SetRepositoryName(req.Name)
-
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}
@@ -60,37 +59,6 @@ func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.R
 	}
 
 	return fireball.NewJSONResponse(202, resp)
-}
-
-func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Response, error) {
-	name := c.PathVariables["name"]
-	input := &ecr.DescribeImagesInput{}
-	input.SetRepositoryName(name)
-	if err := input.Validate(); err != nil {
-		return nil, err
-	}
-
-	tags := []string{}
-	fn := func(output *ecr.DescribeImagesOutput, lastPage bool) bool {
-		for _, image := range output.ImageDetails {
-			for _, tag := range image.ImageTags {
-				tags = append(tags, *tag)
-			}
-		}
-
-		return !lastPage
-	}
-
-	if err := r.ecr.DescribeImagesPages(input, fn); err != nil {
-		return nil, err
-	}
-
-	resp := models.Repository{
-		Name:      name,
-		ImageTags: tags,
-	}
-
-	return fireball.NewJSONResponse(200, resp)
 }
 
 func (r *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.Response, error) {
@@ -108,6 +76,37 @@ func (r *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.R
 	}
 
 	return fireball.NewJSONResponse(200, nil)
+}
+
+func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Response, error) {
+	name := c.PathVariables["name"]
+	input := &ecr.DescribeImagesInput{}
+	input.SetRepositoryName(name)
+	if err := input.Validate(); err != nil {
+		return nil, err
+	}
+
+	tags := []string{}
+	fn := func(output *ecr.DescribeImagesOutput, lastPage bool) bool {
+		for _, image := range output.ImageDetails {
+			for _, tag := range image.ImageTags {
+				tags = append(tags, aws.StringValue(tag))
+			}
+		}
+
+		return !lastPage
+	}
+
+	if err := r.ecr.DescribeImagesPages(input, fn); err != nil {
+		return nil, err
+	}
+
+	resp := models.Repository{
+		Name:      name,
+		ImageTags: tags,
+	}
+
+	return fireball.NewJSONResponse(200, resp)
 }
 
 func (r *RepositoryController) ListRepositories(c *fireball.Context) (fireball.Response, error) {
