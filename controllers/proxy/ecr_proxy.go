@@ -16,6 +16,7 @@ func NewECRProxy(registryEndpoint string) ProxyFunc {
 	return ProxyFunc(func(token string, w http.ResponseWriter, r *http.Request) {
 		r.Header.Set("Authorization", fmt.Sprintf("Basic %s", token))
 		r.Host = registryEndpoint
+
 		reverseProxy.ServeHTTP(w, r)
 	})
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/quintilesims/d.ims.io/controllers/proxy"
 	"github.com/zpatrick/fireball"
 	"github.com/zpatrick/go-cache"
+	"log"
 	"net/http"
 	"time"
 )
@@ -31,6 +32,7 @@ func NewProxyController(ecr ecriface.ECRAPI, p proxy.Proxy) *ProxyController {
 func (p *ProxyController) DoProxy(c *fireball.Context) (fireball.Response, error) {
 	token, err := p.getRegistryAuthToken()
 	if err != nil {
+		log.Printf("[ERROR] Failed to get token for reverse proxy: %v", err)
 		return nil, err
 	}
 

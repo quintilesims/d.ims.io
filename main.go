@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -61,6 +62,10 @@ func main() {
 			Value:  config.DEFAULT_DYNAMO_TABLE,
 			EnvVar: config.ENVVAR_DYNAMO_TABLE,
 		},
+		cli.StringFlag{
+			Name:   "registry-endpoint",
+			EnvVar: config.ENVVAR_REGISTRY_ENDPOINT,
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -68,15 +73,13 @@ func main() {
 			return err
 		}
 
-		// todo: add aws credentials to awsConfig
-		awsConfig := defaults.Get().Config
-		session := session.New(awsConfig)
+		session := getAWSSession(c)
 		dynamodb := dynamodb.New(session)
 		ecr := ecr.New(session)
 
 		tokenManager := auth.NewDynamoTokenManager("todo = table name", dynamodb)
 		auth0Manager := auth.NewAuth0Manager("todo - auth0 endpoint", "todo - auth0 token")
-		proxy := proxy.NewECRProxy("todo - ecr endpoint")
+		proxy := proxy.NewECRProxy(c.String("registry-endpoint"))
 
 		rootController := controllers.NewRootController()
 		repositoryController := controllers.NewRepositoryController(ecr)
@@ -116,10 +119,11 @@ func main() {
 
 func validateConfig(c *cli.Context) error {
 	vars := map[string]error{
-		"aws-access-key": fmt.Errorf("AWS Access Key not set! (EnvVar: %s)", config.ENVVAR_AWS_ACCESS_KEY),
-		"aws-secret-key": fmt.Errorf("AWS Secret Key not set! (EnvVar: %s)", config.ENVVAR_AWS_SECRET_KEY),
-		"aws-region":     fmt.Errorf("AWS Region not set! (EnvVar: %s)", config.ENVVAR_AWS_REGION),
-		"dynamo-table":   fmt.Errorf("Dynamo Table not set! (EnvVar: %s)", config.ENVVAR_DYNAMO_TABLE),
+		"aws-access-key":    fmt.Errorf("AWS Access Key not set! (EnvVar: %s)", config.ENVVAR_AWS_ACCESS_KEY),
+		"aws-secret-key":    fmt.Errorf("AWS Secret Key not set! (EnvVar: %s)", config.ENVVAR_AWS_SECRET_KEY),
+		"aws-region":        fmt.Errorf("AWS Region not set! (EnvVar: %s)", config.ENVVAR_AWS_REGION),
+		"dynamo-table":      fmt.Errorf("Dynamo Table not set! (EnvVar: %s)", config.ENVVAR_DYNAMO_TABLE),
+		"registry-endpoint": fmt.Errorf("Registry endpoint not set! (EnvVar: %s)", config.ENVVAR_REGISTRY_ENDPOINT),
 	}
 
 	for name, err := range vars {
@@ -129,4 +133,12 @@ func validateConfig(c *cli.Context) error {
 	}
 
 	return nil
+}
+
+func getAWSSession(c *cli.Context) *session.Session {
+	config := defaults.Get().Config
+	creds := credentials.NewStaticCredentials(c.String("aws-access-key"), c.String("aws-secret-key"), "")
+	config.WithCredentials(creds)
+	config.WithRegion(c.String("aws-region"))
+	return session.New(config)
 }
