@@ -1,9 +1,10 @@
 package controllers
 
 import (
+	"log"
+
 	"github.com/quintilesims/d.ims.io/auth"
 	"github.com/zpatrick/fireball"
-	"log"
 )
 
 func AuthDecorator(auth auth.Authenticator) fireball.Decorator {

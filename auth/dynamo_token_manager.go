@@ -3,7 +3,6 @@ package auth
 import (
 	"encoding/base64"
 	"fmt"
-	"log"
 	"math/rand"
 
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -50,12 +49,50 @@ func (d *DynamoTokenManager) CreateToken(user string) (string, error) {
 }
 
 func (d *DynamoTokenManager) DeleteToken(token string) error {
-	return fmt.Errorf("DeleteToken not implemented")
+	key := map[string]*dynamodb.AttributeValue{
+		"Token": {
+			S: &token,
+		},
+	}
+	input := &dynamodb.DeleteItemInput{}
+	input.SetTableName(d.table)
+	input.SetKey(key)
+
+	if err := input.Validate(); err != nil {
+		return err
+	}
+
+	if _, err := d.dynamodb.DeleteItem(input); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (d *DynamoTokenManager) Authenticate(user, pass string) (bool, error) {
-	log.Println("[ERROR] - DynamoTokenManager.Authenticate not implemented")
-	return true, nil
+	token := convertToToken(user, pass)
+
+	key := map[string]*dynamodb.AttributeValue{
+		"Token": {
+			S: &token,
+		},
+	}
+
+	input := &dynamodb.GetItemInput{}
+	input.SetTableName(d.table)
+	input.SetConsistentRead(true)
+	input.SetKey(key)
+
+	if err := input.Validate(); err != nil {
+		return false, err
+	}
+
+	output, err := d.dynamodb.GetItem(input)
+	if err != nil {
+		return false, err
+	}
+
+	return len(output.Item) > 0, nil
 }
 
 func convertToToken(user, pass string) string {
