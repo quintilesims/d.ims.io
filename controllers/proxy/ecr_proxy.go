@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"fmt"
 )
 
 func NewECRProxy(registryEndpoint string) ProxyFunc {
@@ -12,7 +13,8 @@ func NewECRProxy(registryEndpoint string) ProxyFunc {
 		Scheme: "https",
 	})
 
-	return ProxyFunc(func(w http.ResponseWriter, r *http.Request) {
+	return ProxyFunc(func(token string, w http.ResponseWriter, r *http.Request) {
+		r.Header.Set("Authorization", fmt.Sprintf("Basic %s", token))
 		r.Host = registryEndpoint
 		reverseProxy.ServeHTTP(w, r)
 	})

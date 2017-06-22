@@ -22,15 +22,13 @@ func NewProxyController(ecr ecriface.ECRAPI, p proxy.Proxy) *ProxyController {
 }
 
 func (p *ProxyController) DoProxy(c *fireball.Context) (fireball.Response, error) {
-
 	token, err := p.getRegistryAuthToken()
 	if err != nil {
 		return nil, err
 	}
 
 	response := fireball.ResponseFunc(func(w http.ResponseWriter, r *http.Request) {
-		r.Header.Set("Authorization", fmt.Sprintf("Basic %s", token))
-		p.proxy.ServeHTTP(w, r)
+		p.proxy.ServeHTTP(token, w, r)
 	})
 
 	return response, nil
