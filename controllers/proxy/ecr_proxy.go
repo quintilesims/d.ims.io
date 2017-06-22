@@ -1,10 +1,10 @@
 package proxy
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"fmt"
 )
 
 func NewECRProxy(registryEndpoint string) ProxyFunc {
