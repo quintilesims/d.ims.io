@@ -5,5 +5,5 @@ import (
 )
 
 type Proxy interface {
-	ServeHTTP(*http.Request, http.ResponseWriter)
+	ServeHTTP(w http.ResponseWriter, r *http.Request)
 }

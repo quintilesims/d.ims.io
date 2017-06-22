@@ -6,6 +6,7 @@ import (
 	"github.com/zpatrick/fireball"
 	//"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
+	"net/http"
 )
 
 type ProxyController struct {
@@ -20,6 +21,21 @@ func NewProxyController(ecr ecriface.ECRAPI, p proxy.Proxy) *ProxyController {
 	}
 }
 
-func (r *ProxyController) DoProxy(c *fireball.Context) (fireball.Response, error) {
-	return nil, fmt.Errorf("proxy controller implemented")
+func (p *ProxyController) DoProxy(c *fireball.Context) (fireball.Response, error) {
+
+	token, err := p.getRegistryAuthToken()
+	if err != nil {
+		return nil, err
+	}
+
+	response := fireball.ResponseFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Set("Authorization", fmt.Sprintf("Basic %s", token))
+		p.proxy.ServeHTTP(w, r)
+	})
+
+	return response, nil
+}
+
+func (p *ProxyController) getRegistryAuthToken() (string, error) {
+	return "", fmt.Errorf("getRegistryAuthToken not implemented")
 }

@@ -16,22 +16,22 @@ func NewTokenController(t auth.TokenManager) *TokenController {
 	}
 }
 
-func (r *TokenController) Routes() []*fireball.Route {
+func (t *TokenController) Routes() []*fireball.Route {
 	return []*fireball.Route{
 		{
 			Path: "/token",
 			Handlers: fireball.Handlers{
-				"DELETE": r.DeleteToken,
-				"POST":   r.CreateToken,
+				"DELETE": t.DeleteToken,
+				"POST":   t.CreateToken,
 			},
 		},
 	}
 }
 
-func (r *TokenController) CreateToken(c *fireball.Context) (fireball.Response, error) {
+func (t *TokenController) CreateToken(c *fireball.Context) (fireball.Response, error) {
 	return nil, fmt.Errorf("Not implemented")
 }
 
-func (r *TokenController) DeleteToken(c *fireball.Context) (fireball.Response, error) {
+func (t *TokenController) DeleteToken(c *fireball.Context) (fireball.Response, error) {
 	return nil, fmt.Errorf("Not implemented")
 }

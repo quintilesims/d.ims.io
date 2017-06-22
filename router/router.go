@@ -1,25 +1,27 @@
 package router
 
 import (
-	"github.com/quintilesims/d.ims.io/controllers"
 	"github.com/zpatrick/fireball"
 	"net/http"
 )
 
 type Router struct {
-	routes          []*fireball.Route
-	proxyController *controllers.ProxyController
-	router          *fireball.BasicRouter
+	router  *fireball.BasicRouter
+	doProxy fireball.Handler
 }
 
-func NewRouter(routes []*fireball.Route, p *controllers.ProxyController) *Router {
+func NewRouter(routes []*fireball.Route, doProxy fireball.Handler) *Router {
 	return &Router{
-		routes:          routes,
-		proxyController: p,
-		router:          fireball.NewBasicRouter(routes),
+		router:  fireball.NewBasicRouter(routes),
+		doProxy: doProxy,
 	}
 }
 
 func (r *Router) Match(req *http.Request) (*fireball.RouteMatch, error) {
-	return r.router.Match(req)
+	match, err := r.router.Match(req)
+	if match != nil || err != nil {
+		return match, err
+	}
+
+	return &fireball.RouteMatch{Handler: r.doProxy}, nil
 }

@@ -84,7 +84,7 @@ func main() {
 		proxyController := controllers.NewProxyController(ecr, proxy)
 		swaggerController := controllers.NewSwaggerController(c.String("swagger-host"))
 
-		compositeAuthenticator := auth.NewCompositeAuthenticator(tokenManager, auth0Manager)
+		authenticator := auth.NewCompositeAuthenticator(tokenManager, auth0Manager)
 
 		routes := rootController.Routes()
 		routes = append(routes, repositoryController.Routes()...)
@@ -92,10 +92,13 @@ func main() {
 		routes = append(routes, swaggerController.Routes()...)
 		routes = fireball.Decorate(routes,
 			fireball.LogDecorator(),
-			controllers.AuthDecorator(compositeAuthenticator))
+			controllers.AuthDecorator(authenticator))
 
 		fb := fireball.NewApp(routes)
-		fb.Router = router.NewRouter(routes, proxyController)
+
+		// decorate proxy handler with auth
+		doProxy := controllers.AuthDecorator(authenticator)(proxyController.DoProxy)
+		fb.Router = router.NewRouter(routes, doProxy)
 
 		port := fmt.Sprintf(":%s", c.String("port"))
 		log.Printf("Running on port %s\n", port)
