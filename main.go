@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+	"os"
+
 	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -13,9 +17,6 @@ import (
 	"github.com/quintilesims/d.ims.io/router"
 	"github.com/urfave/cli"
 	"github.com/zpatrick/fireball"
-	"log"
-	"net/http"
-	"os"
 )
 
 const (
