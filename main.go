@@ -103,7 +103,9 @@ func main() {
 
 		tokenManager := auth.NewDynamoTokenManager(c.String("dynamo-table"), dynamodb)
 		// todo: terraform module will need https in front of domain
-		auth0Manager := auth.NewAuth0Manager(c.String("auth0-domain"), c.String("auth0-client-id"), c.String("auth0-connection"))
+		auth0Manager := auth.NewAuth0Manager(c.String("auth0-domain"),
+			c.String("auth0-client-id"),
+			c.String("auth0-connection"))
 		proxy := proxy.NewECRProxy(c.String("registry-endpoint"))
 
 		rootController := controllers.NewRootController()
