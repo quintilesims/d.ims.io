@@ -171,6 +171,13 @@
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
 		{
+			"checksumSHA1": "OFu4xJEIjiI8Suu+j/gabfp+y6Q=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "f6abca593680b2315d2075e0f5e2a9751e3f431a",
+			"revisionTime": "2017-06-01T20:57:54Z"
+		},
+		{
 			"checksumSHA1": "VvZKmbuBN1QAG699KduTdmSPwA4=",
 			"origin": "github.com/aws/aws-sdk-go/vendor/github.com/go-ini/ini",
 			"path": "github.com/go-ini/ini",
@@ -178,10 +185,10 @@
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
 		{
-			"checksumSHA1": "JSHl8b3nI8EWvzm+uyrIqj2Hiu4=",
+			"checksumSHA1": "I2lXmuk1IHZmw+zDXgTGi0+LvpY=",
 			"path": "github.com/golang/mock/gomock",
-			"revision": "bd3c8e81be01eef76d4b503f5e687d2d1354d2d9",
-			"revisionTime": "2016-01-21T18:51:14Z"
+			"revision": "15f8b22550555c0d3edf5afa97d74001bda2208b",
+			"revisionTime": "2015-06-12T17:25:59Z"
 		},
 		{
 			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
@@ -209,6 +216,19 @@
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
 		{
+			"checksumSHA1": "zKKp5SZ3d3ycKe4EKMNT0BqAWBw=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "f6abca593680b2315d2075e0f5e2a9751e3f431a",
+			"revisionTime": "2017-06-01T20:57:54Z"
+		},
+		{
+			"checksumSHA1": "5NBHAe3S15q3L9hOLThnMZjIZRE=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "f6abca593680b2315d2075e0f5e2a9751e3f431a",
+			"revisionTime": "2017-06-01T20:57:54Z"
+		},
+		{
 			"checksumSHA1": "7cxwOBG3z8bcqlACknqxIV+jB/o=",
 			"path": "github.com/urfave/cli",
 			"revision": "f1be59ff3d239f0942b201619030d302bce912cc",
@@ -221,10 +241,10 @@
 			"revisionTime": "2017-04-10T20:56:13Z"
 		},
 		{
-			"checksumSHA1": "2wFTnvTgS2Oyxff18p/sv3TJTg0=",
+			"checksumSHA1": "QeZ2xsLZBpItk0uZtsh1T7NofPg=",
 			"path": "github.com/zpatrick/go-cache",
-			"revision": "f34d0b213bd025931257827ee96ea44075d79428",
-			"revisionTime": "2017-06-16T18:55:10Z"
+			"revision": "07dbf58cb418d923cced58e7201d742c6adb969d",
+			"revisionTime": "2017-06-17T15:00:56Z"
 		},
 		{
 			"checksumSHA1": "ToPsFeShbYoBMN3uHimpRb536GE=",
@@ -235,7 +255,7 @@
 		{
 			"checksumSHA1": "YLTesJKrzaqi/LDrtImc/O4JX94=",
 			"path": "github.com/zpatrick/rclient",
-			"revision": "c0b4afdd3d7f5bbb8f22474465f973d19734a66e",
+			"revision": "8e281dcd539b2c8c180e999c6f97f472d8cbee32",
 			"revisionTime": "2017-06-22T21:53:04Z"
 		}
 	],
