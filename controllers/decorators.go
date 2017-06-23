@@ -15,16 +15,18 @@ func AuthDecorator(auth auth.Authenticator) fireball.Decorator {
 
 			user, pass, ok := c.Request.BasicAuth()
 			if !ok {
+				log.Printf("[DEBUG] Request %s %s did not contain basic auth", c.Request.Method, c.Request.URL.String())
 				return invalidAuthResponse, nil
 			}
 
 			isAuthenticated, err := auth.Authenticate(user, pass)
 			if err != nil {
-				log.Printf("[ERROR] Failed to authenticate: %v", err)
+				log.Printf("[ERROR] Authenticator encountered an unexpected error: %v", err)
 				return nil, err
 			}
 
 			if !isAuthenticated {
+				log.Printf("[DEBUG] User '%s' failed to authenticate: %v", user, err)
 				return invalidAuthResponse, nil
 			}
 
