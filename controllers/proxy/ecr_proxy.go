@@ -1,19 +1,22 @@
 package proxy
 
 import (
+	"fmt"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 )
 
-type ECRProxy struct {
-	endpoint string
-}
+func NewECRProxy(registryEndpoint string) ProxyFunc {
+	reverseProxy := httputil.NewSingleHostReverseProxy(&url.URL{
+		Host:   registryEndpoint,
+		Scheme: "https",
+	})
 
-func NewECRProxy(endpoint string) *ECRProxy {
-	return &ECRProxy{
-		endpoint: endpoint,
-	}
-}
+	return ProxyFunc(func(token string, w http.ResponseWriter, r *http.Request) {
+		r.Header.Set("Authorization", fmt.Sprintf("Basic %s", token))
+		r.Host = registryEndpoint
 
-func (e *ECRProxy) ServeHTTP(r *http.Request, w http.ResponseWriter) {
-	http.Error(w, "ecr proxy not implemented", 500)
+		reverseProxy.ServeHTTP(w, r)
+	})
 }
