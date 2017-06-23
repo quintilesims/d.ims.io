@@ -8,17 +8,13 @@ import (
 	"github.com/zpatrick/rclient"
 )
 
+var timeMultiplier = 1 * time.Second
+
 type Auth0Manager struct {
 	clientID   string
 	connection string
 	client     *rclient.RestClient
 	cache      *cache.Cache
-}
-
-type Auth0Config struct {
-	Domain     string
-	ClientID   string
-	Connection string
 }
 
 type oauthReq struct {
@@ -40,11 +36,11 @@ const (
 	validAuthExpiry = 1 * time.Hour
 )
 
-func NewAuth0Manager(config Auth0Config) *Auth0Manager {
+func NewAuth0Manager(domain, clientID, connection string) *Auth0Manager {
 	return &Auth0Manager{
-		clientID:   config.ClientID,
-		connection: config.Connection,
-		client:     rclient.NewRestClient(config.Domain),
+		clientID:   clientID,
+		connection: connection,
+		client:     rclient.NewRestClient(domain),
 		cache:      cache.New(),
 	}
 }
@@ -63,7 +59,7 @@ func (a *Auth0Manager) Authenticate(username, password string) (bool, error) {
 	}
 
 	// will only sleep if cachedStatus already exists with a penalty
-	time.Sleep(cachedStatus.penalty)
+	time.Sleep(cachedStatus.penalty * timeMultiplier)
 
 	req := oauthReq{
 		ClientID:   a.clientID,

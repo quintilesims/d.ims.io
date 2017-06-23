@@ -3,6 +3,7 @@ package auth
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -57,7 +58,7 @@ func TestAuth0ManagerAuthenticate_InvalidCreds(t *testing.T) {
 	assert.Equal(t, valid, false)
 }
 
-func TestAuth0ManagerAuthenticate_GoodCredsTurnedBad(t *testing.T) {
+func TestAuth0ManagerAuthenticate_ValidCredsAreCached(t *testing.T) {
 	count := 0
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
@@ -67,17 +68,10 @@ func TestAuth0ManagerAuthenticate_GoodCredsTurnedBad(t *testing.T) {
 		var req oauthReq
 		Unmarshal(t, r, &req)
 
-		if count == 0 {
-			assert.Equal(t, req.Username, "valid username")
-			assert.Equal(t, req.Password, "valid password")
+		assert.Equal(t, req.Username, "valid username")
+		assert.Equal(t, req.Password, "valid password")
 
-			MarshalAndWrite(t, w, nil, 200)
-		} else {
-			assert.Equal(t, req.Username, "valid username")
-			assert.Equal(t, req.Password, "invalid password")
-
-			MarshalAndWrite(t, w, nil, 401)
-		}
+		MarshalAndWrite(t, w, nil, 200)
 
 		count++
 	}
@@ -92,15 +86,17 @@ func TestAuth0ManagerAuthenticate_GoodCredsTurnedBad(t *testing.T) {
 
 	assert.Equal(t, valid, true)
 
-	valid, err = auth0Manager.Authenticate("valid username", "invalid password")
+	valid, err = auth0Manager.Authenticate("valid username", "valid password")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, valid, false)
+	assert.Equal(t, valid, true)
+	assert.Equal(t, count, 1)
 }
 
 func TestAuth0ManagerAuthenticate_BadCredsTurnedGood(t *testing.T) {
+	timeMultiplier = 0 * time.Second
 	count := 0
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
@@ -110,15 +106,12 @@ func TestAuth0ManagerAuthenticate_BadCredsTurnedGood(t *testing.T) {
 		var req oauthReq
 		Unmarshal(t, r, &req)
 
-		if count == 0 {
-			assert.Equal(t, req.Username, "valid username")
-			assert.Equal(t, req.Password, "invalid password")
+		assert.Equal(t, req.Username, "username")
+		assert.Equal(t, req.Password, "password")
 
+		if count == 0 {
 			MarshalAndWrite(t, w, nil, 401)
 		} else {
-			assert.Equal(t, req.Username, "valid username")
-			assert.Equal(t, req.Password, "valid password")
-
 			MarshalAndWrite(t, w, nil, 200)
 		}
 
@@ -128,17 +121,18 @@ func TestAuth0ManagerAuthenticate_BadCredsTurnedGood(t *testing.T) {
 	auth0Manager, server := newAuth0ManagerAndServer(handler)
 	defer server.Close()
 
-	valid, err := auth0Manager.Authenticate("valid username", "invalid password")
+	valid, err := auth0Manager.Authenticate("username", "password")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	assert.Equal(t, valid, false)
 
-	valid, err = auth0Manager.Authenticate("valid username", "valid password")
+	valid, err = auth0Manager.Authenticate("username", "password")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	assert.Equal(t, valid, true)
+	assert.Equal(t, count, 2)
 }
