@@ -72,6 +72,7 @@ func main() {
 			Name:   "registry-endpoint",
 			EnvVar: config.ENVVAR_REGISTRY_ENDPOINT,
 		},
+		cli.StringFlag{
 			Name:   "auth0-domain",
 			Value:  config.DEFAULT_AUTH0_DOMAIN,
 			EnvVar: config.ENVVAR_AUTH0_DOMAIN,
@@ -83,7 +84,7 @@ func main() {
 		cli.StringFlag{
 			Name:   "auth0-connection",
 			EnvVar: config.ENVVAR_AUTH0_CONNECTION,
-		}
+		},
 	}
 
 	app.Before = func(c *cli.Context) error {
@@ -101,15 +102,8 @@ func main() {
 		ecr := ecr.New(session)
 
 		tokenManager := auth.NewDynamoTokenManager(c.String("dynamo-table"), dynamodb)
-
 		// todo: terraform module will need https in front of domain
-		auth0Config := auth.Auth0Config{
-			Domain:     c.String("auth0-domain"),
-			ClientID:   c.String("auth0-client-id"),
-			Connection: c.String("auth0-connection"),
-		}
-		auth0Manager := auth.NewAuth0Manager(auth0Config)
-
+		auth0Manager := auth.NewAuth0Manager(c.String("auth0-domain"), c.String("auth0-client-id"), c.String("auth0-connection"))
 		proxy := proxy.NewECRProxy(c.String("registry-endpoint"))
 
 		rootController := controllers.NewRootController()

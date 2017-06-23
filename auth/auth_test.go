@@ -13,11 +13,7 @@ type Handler func(w http.ResponseWriter, r *http.Request)
 
 func newAuth0ManagerAndServer(handler Handler) (*Auth0Manager, *httptest.Server) {
 	server := httptest.NewServer(http.HandlerFunc(handler))
-	auth0Manager := NewAuth0Manager(Auth0Config{
-		Domain:     server.URL,
-		ClientID:   "",
-		Connection: "",
-	})
+	auth0Manager := NewAuth0Manager(server.URL, "", "")
 
 	return auth0Manager, server
 }
