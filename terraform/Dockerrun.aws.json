@@ -1,0 +1,51 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions": [
+        {
+            "name": "d.ims.io",
+            "image": "${docker_image}",
+            "essential": true,
+            "memory": 128,
+            "environment": [
+                {
+                    "name": "DIMSIO_PORT",
+                    "value": "80"
+                },
+                {
+                    "name": "DIMSIO_DEBUG",
+                    "value": "false"
+                },                
+                {
+                    "name": "DIMSIO_AWS_ACCESS_KEY",
+                    "value": "${aws_access_key}"
+                },
+                {
+                    "name": "DIMSIO_AWS_SECRET_KEY",
+                    "value": "${aws_secret_key}"
+                },
+                {
+                    "name": "DIMSIO_AWS_REGION",
+                    "value": "${aws_region}"
+                },
+                {
+                    "name": "DIMSIO_SWAGGER_HOST",
+                    "value": "${swagger_host}"
+                },
+                {
+                    "name": "DIMSIO_DYNAMO_TABLE",
+                    "value": "${dynamo_table}"
+                },
+                {
+                    "name": "DIMSIO_REGISTRY_ENDPOINT",
+                    "value": "${registry_endpoint}"
+                }
+            ],
+            "portMappings": [
+                {
+                    "hostPort": 80,
+                    "containerPort": 80
+                }
+            ]
+        }
+    ]
+}
