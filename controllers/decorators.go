@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"log"
+
 	"github.com/quintilesims/d.ims.io/auth"
 	"github.com/zpatrick/fireball"
 )
@@ -18,6 +20,7 @@ func AuthDecorator(auth auth.Authenticator) fireball.Decorator {
 
 			isAuthenticated, err := auth.Authenticate(user, pass)
 			if err != nil {
+				log.Printf("[ERROR] Failed to authenticate: %v", err)
 				return nil, err
 			}
 

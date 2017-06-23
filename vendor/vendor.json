@@ -178,6 +178,12 @@
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
 		{
+			"checksumSHA1": "JSHl8b3nI8EWvzm+uyrIqj2Hiu4=",
+			"path": "github.com/golang/mock/gomock",
+			"revision": "bd3c8e81be01eef76d4b503f5e687d2d1354d2d9",
+			"revisionTime": "2016-01-21T18:51:14Z"
+		},
+		{
 			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
 			"path": "github.com/gorilla/context",
 			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
@@ -215,16 +221,22 @@
 			"revisionTime": "2017-04-10T20:56:13Z"
 		},
 		{
+			"checksumSHA1": "2wFTnvTgS2Oyxff18p/sv3TJTg0=",
+			"path": "github.com/zpatrick/go-cache",
+			"revision": "f34d0b213bd025931257827ee96ea44075d79428",
+			"revisionTime": "2017-06-16T18:55:10Z"
+		},
+		{
 			"checksumSHA1": "ToPsFeShbYoBMN3uHimpRb536GE=",
 			"path": "github.com/zpatrick/go-plugin-swagger",
 			"revision": "c139ec9f5696a2beeea758f7303b5311f91664c0",
 			"revisionTime": "2017-04-29T20:43:32Z"
 		},
 		{
-			"checksumSHA1": "vWRltn86dBjcd3cXvXqYPV/Y+xE=",
+			"checksumSHA1": "YLTesJKrzaqi/LDrtImc/O4JX94=",
 			"path": "github.com/zpatrick/rclient",
-			"revision": "970d4b3fda75b6144a9ff60ae9bfd4a6c752e7d5",
-			"revisionTime": "2017-06-21T22:46:25Z"
+			"revision": "c0b4afdd3d7f5bbb8f22474465f973d19734a66e",
+			"revisionTime": "2017-06-22T21:53:04Z"
 		}
 	],
 	"rootPath": "github.com/quintilesims/d.ims.io"
