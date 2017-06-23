@@ -8,7 +8,7 @@ import (
 	"github.com/zpatrick/rclient"
 )
 
-var timeMultiplier = 1 * time.Second
+var timeMultiplier = 1
 
 type Auth0Manager struct {
 	clientID   string
@@ -59,7 +59,7 @@ func (a *Auth0Manager) Authenticate(username, password string) (bool, error) {
 	}
 
 	// will only sleep if cachedStatus already exists with a penalty
-	time.Sleep(cachedStatus.penalty * timeMultiplier)
+	time.Sleep(cachedStatus.penalty * time.Duration(timeMultiplier))
 
 	req := oauthReq{
 		ClientID:   a.clientID,
