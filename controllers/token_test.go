@@ -40,33 +40,3 @@ func TestDeleteToken(t *testing.T) {
 		t.Fatal(err)
 	}
 }
-
-/*
-func TestDeleteToken(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockECR := mock.NewMockECRAPI(ctrl)
-	controller := NewTokenController(mockECR)
-
-	validateDeleteTokenInput := func(input *ecr.DeleteTokenInput) {
-		if v, want := aws.StringValue(input.TokenName), "test"; v != want {
-			t.Errorf("Name was '%v', expected '%v'", v, want)
-		}
-
-		if v, want := aws.BoolValue(input.Force), true; v != want {
-			t.Errorf("Force was '%v', expected '%v'", v, want)
-		}
-	}
-
-	mockECR.EXPECT().
-		DeleteToken(gomock.Any()).
-		Do(validateDeleteTokenInput).
-		Return(&ecr.DeleteTokenOutput{}, nil)
-
-	c := generateContext(t, nil, map[string]string{"name": "test"})
-	if _, err := controller.DeleteToken(c); err != nil {
-		t.Fatal(err)
-	}
-}
-*/
