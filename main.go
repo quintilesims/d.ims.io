@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
-
 	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -89,7 +88,7 @@ func main() {
 		dynamodb := dynamodb.New(session)
 		ecr := ecr.New(session)
 
-		tokenManager := auth.NewDynamoTokenManager("todo = table name", dynamodb)
+		tokenManager := auth.NewDynamoTokenManager(c.String("dynamo-table"), dynamodb)
 		auth0Manager := auth.NewAuth0Manager("todo - auth0 endpoint", "todo - auth0 token")
 		proxy := proxy.NewECRProxy(c.String("registry-endpoint"))
 
