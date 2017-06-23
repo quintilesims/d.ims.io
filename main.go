@@ -80,7 +80,7 @@ func main() {
 			return err
 		}
 
-		log.SetOutput(logging.NewLogger(c.Bool("debug")))
+		log.SetOutput(logging.NewLogWriter(c.Bool("debug")))
 		return nil
 	}
 

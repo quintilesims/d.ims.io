@@ -12,7 +12,7 @@ func (w WriterFunc) Write(p []byte) (n int, err error) {
 	return w(p)
 }
 
-func NewLogger(debug bool) io.Writer {
+func NewLogWriter(debug bool) io.Writer {
 	return WriterFunc(func(p []byte) (n int, err error) {
 		if !debug && strings.Contains(string(p), "[DEBUG]") {
 			return 0, nil
