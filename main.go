@@ -16,6 +16,7 @@ import (
 	"github.com/quintilesims/d.ims.io/config"
 	"github.com/quintilesims/d.ims.io/controllers"
 	"github.com/quintilesims/d.ims.io/controllers/proxy"
+	"github.com/quintilesims/d.ims.io/logging"
 	"github.com/quintilesims/d.ims.io/router"
 	"github.com/urfave/cli"
 	"github.com/zpatrick/fireball"
@@ -40,6 +41,10 @@ func main() {
 			Name:   "p, port",
 			Value:  config.DEFAULT_PORT,
 			EnvVar: config.ENVVAR_PORT,
+		},
+		cli.BoolFlag{
+			Name:   "d, debug",
+			EnvVar: config.ENVVAR_DEBUG,
 		},
 		cli.StringFlag{
 			Name:   "aws-access-key",
@@ -70,11 +75,16 @@ func main() {
 		},
 	}
 
-	app.Action = func(c *cli.Context) error {
+	app.Before = func(c *cli.Context) error {
 		if err := validateConfig(c); err != nil {
 			return err
 		}
 
+		log.SetOutput(logging.NewLogger(c.Bool("debug")))
+		return nil
+	}
+
+	app.Action = func(c *cli.Context) error {
 		session := getAWSSession(c)
 		dynamodb := dynamodb.New(session)
 		ecr := ecr.New(session)
@@ -106,7 +116,7 @@ func main() {
 		fb.Router = router.NewRouter(routes, doProxy)
 
 		port := fmt.Sprintf(":%s", c.String("port"))
-		log.Printf("Running on port %s\n", port)
+		log.Printf("[INFO] Running on port %s\n", port)
 		http.Handle("/", fb)
 
 		http.HandleFunc(SWAGGER_URL, serveSwaggerUI)
