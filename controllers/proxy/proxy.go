@@ -5,5 +5,11 @@ import (
 )
 
 type Proxy interface {
-	ServeHTTP(*http.Request, http.ResponseWriter)
+	ServeHTTP(token string, w http.ResponseWriter, r *http.Request)
+}
+
+type ProxyFunc func(token string, w http.ResponseWriter, r *http.Request)
+
+func (p ProxyFunc) ServeHTTP(token string, w http.ResponseWriter, r *http.Request) {
+	p(token, w, r)
 }
