@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"fmt"
-	"net/url"
 	"encoding/json"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -82,11 +80,7 @@ func (r *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.R
 }
 
 func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Response, error) {
-	name, err := url.QueryUnescape(c.PathVariables["name"])
-	if err != nil {
-		return nil, fmt.Errorf("Failed to parse repository name: %v", err)
-	}
-
+	name := c.PathVariables["name"]
 	input := &ecr.DescribeImagesInput{}
 	input.SetRepositoryName(name)
 	if err := input.Validate(); err != nil {
