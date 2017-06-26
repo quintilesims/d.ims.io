@@ -38,6 +38,18 @@
                 {
                     "name": "DIMSIO_REGISTRY_ENDPOINT",
                     "value": "${registry_endpoint}"
+                },
+		{
+                    "name": "DIMSIO_AUTH0_DOMAINN",
+                    "value": "${auth0_domain}"
+                },
+                {
+                    "name": "DIMSIO_AUTH0_CLIENT_ID",
+                    "value": "${auth0_client_id}"
+                },
+                {
+                    "name": "DIMSIO_AUTH0_CONNECTION",
+                    "value": "${auth0_connection}"
                 }
             ],
             "portMappings": [
