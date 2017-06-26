@@ -30,7 +30,7 @@ data "template_file" "user_policy" {
   template = "${file("${path.module}/user_policy.json")}"
 
   vars {
-    dynamo_table_arn = "${aws_dynamodb_table.dimsio.arn}"
+    dynamodb_table_arn = "${aws_dynamodb_table.dimsio.arn}"
   }
 }
 
@@ -69,8 +69,8 @@ data "template_file" "dimsio" {
 
   vars {
     docker_image      = "${var.docker_image}"
-    aws_access_key    = "${aws_iam_access_key.dimsio.access_key}"
-    aws_secret_key    = "${aws_iam_access_key.dimsio.secret_key}"
+    aws_access_key    = "${aws_iam_access_key.dimsio.id}"
+    aws_secret_key    = "${aws_iam_access_key.dimsio.secret}"
     aws_region        = "${var.aws_region}"
     swagger_host      = "${layer0_load_balancer.dimsio.url}"
     dynamo_table      = "${aws_dynamodb_table.dimsio.name}"
