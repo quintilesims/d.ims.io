@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ecr"
@@ -25,12 +27,18 @@ func (r *RepositoryController) Routes() []*fireball.Route {
 		{
 			Path: "/repository",
 			Handlers: fireball.Handlers{
-				"GET":  r.ListRepositories,
-				"POST": r.CreateRepository,
+				"GET": r.ListRepositories,
 			},
 		},
 		{
-			Path: "/repository/:name",
+			Path: "/repository/:owner",
+			Handlers: fireball.Handlers{
+				"POST": r.CreateRepository,
+				"GET":  r.ListOwnerRepositories,
+			},
+		},
+		{
+			Path: "/repository/:owner/:name",
 			Handlers: fireball.Handlers{
 				"GET":    r.GetRepository,
 				"DELETE": r.DeleteRepository,
@@ -40,15 +48,22 @@ func (r *RepositoryController) Routes() []*fireball.Route {
 }
 
 func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.Response, error) {
+	owner := c.PathVariables["owner"]
+
 	var req models.CreateRepositoryRequest
 	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
 		return nil, err
 	}
 
+	if err := req.Validate(); err != nil {
+		return nil, fireball.NewError(400, err, nil)
+	}
+
+	repo := fmt.Sprintf("%s/%s", owner, req.Name)
 	input := &ecr.CreateRepositoryInput{}
-	input.SetRepositoryName(req.Name)
+	input.SetRepositoryName(repo)
 	if err := input.Validate(); err != nil {
-		return nil, err
+		return nil, fireball.NewError(400, err, nil)
 	}
 
 	if _, err := r.ecr.CreateRepository(input); err != nil {
@@ -56,16 +71,20 @@ func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.R
 	}
 
 	resp := models.CreateRepositoryResponse{
-		Name: req.Name,
+		Owner: owner,
+		Name:  req.Name,
 	}
 
 	return fireball.NewJSONResponse(202, resp)
 }
 
 func (r *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.Response, error) {
+	owner := c.PathVariables["owner"]
 	name := c.PathVariables["name"]
+	repo := fmt.Sprintf("%s/%s", owner, name)
+
 	input := &ecr.DeleteRepositoryInput{}
-	input.SetRepositoryName(name)
+	input.SetRepositoryName(repo)
 	input.SetForce(true)
 
 	if err := input.Validate(); err != nil {
@@ -80,9 +99,12 @@ func (r *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.R
 }
 
 func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Response, error) {
+	owner := c.PathVariables["owner"]
 	name := c.PathVariables["name"]
+	repo := fmt.Sprintf("%s/%s", owner, name)
+
 	input := &ecr.DescribeImagesInput{}
-	input.SetRepositoryName(name)
+	input.SetRepositoryName(repo)
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}
@@ -103,6 +125,7 @@ func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Resp
 	}
 
 	resp := models.Repository{
+		Owner:     owner,
 		Name:      name,
 		ImageTags: tags,
 	}
@@ -120,6 +143,37 @@ func (r *RepositoryController) ListRepositories(c *fireball.Context) (fireball.R
 	fn := func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
 		for _, repository := range output.Repositories {
 			repositories = append(repositories, aws.StringValue(repository.RepositoryName))
+		}
+
+		return !lastPage
+	}
+
+	if err := r.ecr.DescribeRepositoriesPages(input, fn); err != nil {
+		return nil, err
+	}
+
+	resp := models.ListRepositoriesResponse{
+		Repositories: repositories,
+	}
+
+	return fireball.NewJSONResponse(200, resp)
+}
+
+func (r *RepositoryController) ListOwnerRepositories(c *fireball.Context) (fireball.Response, error) {
+	owner := c.PathVariables["owner"]
+
+	input := &ecr.DescribeRepositoriesInput{}
+	if err := input.Validate(); err != nil {
+		return nil, err
+	}
+
+	repositories := []string{}
+	fn := func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
+		for _, repository := range output.Repositories {
+			repositoryName := aws.StringValue(repository.RepositoryName)
+			if strings.HasPrefix(repositoryName, fmt.Sprintf("%s/", owner)) {
+				repositories = append(repositories, repositoryName)
+			}
 		}
 
 		return !lastPage
