@@ -42,3 +42,15 @@ variable "docker_image" {
   description = "Docker image to use"
   default     = "quintilesims/d.ims.io:latest"
 }
+
+variable "auth0_domain" {
+  default = "https://imshealth.auth0.com"
+}
+
+variable "auth0_connection" {
+    description = "The name of the Auth0 connnection to use for AD validation"
+}
+
+variable "auth0_client_id" {
+    description = "The client id associated with the Auth0 connection"
+}

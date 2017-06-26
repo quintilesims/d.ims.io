@@ -75,5 +75,8 @@ data "template_file" "dimsio" {
     swagger_host      = "${layer0_load_balancer.dimsio.url}"
     dynamo_table      = "${aws_dynamodb_table.dimsio.name}"
     registry_endpoint = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com"
+    auth0_domain      = "${var.auth0_domain}"
+    auth0_client_id   = "${var.auth0_client_id}"
+    auth0_connection  = "${var.auth0_connection}"
   }
 }
