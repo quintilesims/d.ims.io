@@ -67,6 +67,21 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 					},
 				},
 			},
+			"/token/{token}": map[string]swagger.Method{
+				"delete": {
+					Tags:     []string{"Token"},
+					Summary:  "Delete a Token",
+					Security: swagger.BasicAuthSecurity("login"),
+					Parameters: []swagger.Parameter{
+						swagger.NewStringPathParam("token", "The token to delete", true),
+					},
+					Responses: map[string]swagger.Response{
+						"200": {
+							Description: "success",
+						},
+					},
+				},
+			},
 			"/repository": map[string]swagger.Method{
 				"get": {
 					Tags:     []string{"Repository"},
@@ -79,11 +94,28 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 						},
 					},
 				},
+			},
+			"/repository/{owner}": map[string]swagger.Method{
+				"get": {
+					Tags:     []string{"Repository"},
+					Summary:  "List all Repositories for an Owner",
+					Security: swagger.BasicAuthSecurity("login"),
+					Parameters: []swagger.Parameter{
+						swagger.NewStringPathParam("owner", "Owner of the Repositories", true),
+					},
+					Responses: map[string]swagger.Response{
+						"200": {
+							Description: "success",
+							Schema:      swagger.NewObjectSchema("ListRepositoriesResponse"),
+						},
+					},
+				},
 				"post": {
 					Tags:     []string{"Repository"},
 					Summary:  "Create a new Repository",
 					Security: swagger.BasicAuthSecurity("login"),
 					Parameters: []swagger.Parameter{
+						swagger.NewStringPathParam("owner", "Owner for the Repository", true),
 						swagger.NewBodyParam("CreateRepositoryRequest", "none", true),
 					},
 					Responses: map[string]swagger.Response{
@@ -94,18 +126,33 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 					},
 				},
 			},
-			"/repository/{name}": map[string]swagger.Method{
+			"/repository/{owner}/{name}": map[string]swagger.Method{
 				"get": {
 					Tags:     []string{"Repository"},
 					Summary:  "Describe a Repository",
 					Security: swagger.BasicAuthSecurity("login"),
 					Parameters: []swagger.Parameter{
-						swagger.NewStringPathParam("name", "Name of the respository to describe", true),
+						swagger.NewStringPathParam("owner", "Owner of the Repository", true),
+						swagger.NewStringPathParam("name", "Name of the Repository", true),
 					},
 					Responses: map[string]swagger.Response{
 						"200": {
 							Description: "success",
 							Schema:      swagger.NewObjectSchema("Repository"),
+						},
+					},
+				},
+				"delete": {
+					Tags:     []string{"Repository"},
+					Summary:  "Delete a Repository",
+					Security: swagger.BasicAuthSecurity("login"),
+					Parameters: []swagger.Parameter{
+						swagger.NewStringPathParam("owner", "Owner of the Repository", true),
+						swagger.NewStringPathParam("name", "Name of the Repository", true),
+					},
+					Responses: map[string]swagger.Response{
+						"200": {
+							Description: "success",
 						},
 					},
 				},

@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/zpatrick/go-plugin-swagger"
 )
 
@@ -15,4 +17,12 @@ func (r CreateRepositoryRequest) Definition() swagger.Definition {
 			"name": swagger.NewStringProperty(),
 		},
 	}
+}
+
+func (r CreateRepositoryRequest) Validate() error {
+	if r.Name == "" {
+		return fmt.Errorf("Field 'name' is required")
+	}
+
+	return nil
 }
