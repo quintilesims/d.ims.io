@@ -5,14 +5,16 @@ import (
 )
 
 type CreateRepositoryResponse struct {
-	Name string `json:"name"`
+	Owner string `json:"owner"`
+	Name  string `json:"name"`
 }
 
 func (r CreateRepositoryResponse) Definition() swagger.Definition {
 	return swagger.Definition{
 		Type: "object",
 		Properties: map[string]swagger.Property{
-			"name": swagger.NewStringProperty(),
+			"owner": swagger.NewStringProperty(),
+			"name":  swagger.NewStringProperty(),
 		},
 	}
 }

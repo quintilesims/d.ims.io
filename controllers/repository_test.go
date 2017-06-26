@@ -18,7 +18,7 @@ func TestCreateRepository(t *testing.T) {
 	controller := NewRepositoryController(mockECR)
 
 	validateCreateRepositoryInput := func(input *ecr.CreateRepositoryInput) {
-		if v, want := aws.StringValue(input.RepositoryName), "test"; v != want {
+		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
 			t.Errorf("Name was '%v', expected '%v'", v, want)
 		}
 	}
@@ -28,7 +28,7 @@ func TestCreateRepository(t *testing.T) {
 		Do(validateCreateRepositoryInput).
 		Return(&ecr.CreateRepositoryOutput{}, nil)
 
-	c := generateContext(t, models.CreateRepositoryRequest{Name: "test"}, nil)
+	c := generateContext(t, models.CreateRepositoryRequest{Name: "test"}, map[string]string{"owner": "user"})
 	if _, err := controller.CreateRepository(c); err != nil {
 		t.Fatal(err)
 	}
@@ -42,7 +42,7 @@ func TestDeleteRepository(t *testing.T) {
 	controller := NewRepositoryController(mockECR)
 
 	validateDeleteRepositoryInput := func(input *ecr.DeleteRepositoryInput) {
-		if v, want := aws.StringValue(input.RepositoryName), "test"; v != want {
+		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
 			t.Errorf("Name was '%v', expected '%v'", v, want)
 		}
 
@@ -56,7 +56,7 @@ func TestDeleteRepository(t *testing.T) {
 		Do(validateDeleteRepositoryInput).
 		Return(&ecr.DeleteRepositoryOutput{}, nil)
 
-	c := generateContext(t, nil, map[string]string{"name": "test"})
+	c := generateContext(t, nil, map[string]string{"name": "test", "owner": "user"})
 	if _, err := controller.DeleteRepository(c); err != nil {
 		t.Fatal(err)
 	}
@@ -70,7 +70,7 @@ func TestGetRepository(t *testing.T) {
 	controller := NewRepositoryController(mockECR)
 
 	validateDescribeImagesInput := func(input *ecr.DescribeImagesInput, fn func(*ecr.DescribeImagesOutput, bool) bool) {
-		if v, want := aws.StringValue(input.RepositoryName), "test"; v != want {
+		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
 			t.Errorf("Name was '%v', expected '%v'", v, want)
 		}
 	}
@@ -80,7 +80,7 @@ func TestGetRepository(t *testing.T) {
 		Do(validateDescribeImagesInput).
 		Return(nil)
 
-	c := generateContext(t, nil, map[string]string{"name": "test"})
+	c := generateContext(t, nil, map[string]string{"name": "test", "owner": "user"})
 	if _, err := controller.GetRepository(c); err != nil {
 		t.Fatal(err)
 	}
