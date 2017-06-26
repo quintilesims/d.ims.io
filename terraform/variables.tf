@@ -56,17 +56,9 @@ variable "auth0_domain" {
 }
 
 variable "auth0_connection" {
-<<<<<<< HEAD
-    description = "The name of the Auth0 connnection to use for AD validation"
-}
-
-variable "auth0_client_id" {
-    description = "The client id associated with the Auth0 connection"
-=======
   description = "The name of the Auth0 connnection to use for AD validation"
 }
 
 variable "auth0_client_id" {
   description = "The client id associated with the Auth0 connection"
->>>>>>> develop
 }
