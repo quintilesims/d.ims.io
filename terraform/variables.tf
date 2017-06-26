@@ -2,6 +2,14 @@ variable "dynamodb_table_name" {
   default = "d.ims.io"
 }
 
+variable "dynamodb_read_capacity" {
+  default = 1
+}
+
+variable "dynamodb_write_capacity" {
+  default = 1
+}
+
 variable "iam_user_name" {
   default = "d.ims.io"
 }
@@ -48,9 +56,9 @@ variable "auth0_domain" {
 }
 
 variable "auth0_connection" {
-    description = "The name of the Auth0 connnection to use for AD validation"
+  description = "The name of the Auth0 connnection to use for AD validation"
 }
 
 variable "auth0_client_id" {
-    description = "The client id associated with the Auth0 connection"
+  description = "The client id associated with the Auth0 connection"
 }
