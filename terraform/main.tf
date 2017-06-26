@@ -2,8 +2,8 @@ data "aws_caller_identity" "current" {}
 
 resource "aws_dynamodb_table" "dimsio" {
   name           = "${var.dynamodb_table_name}"
-  read_capacity  = 1
-  write_capacity = 1
+  read_capacity  = "${var.dynamodb_read_capacity}"
+  write_capacity = "${var.dynamodb_write_capacity}"
   hash_key       = "Token"
 
   attribute {
