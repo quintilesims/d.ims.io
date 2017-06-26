@@ -171,11 +171,24 @@
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
 		{
+			"checksumSHA1": "OFu4xJEIjiI8Suu+j/gabfp+y6Q=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "f6abca593680b2315d2075e0f5e2a9751e3f431a",
+			"revisionTime": "2017-06-01T20:57:54Z"
+		},
+		{
 			"checksumSHA1": "VvZKmbuBN1QAG699KduTdmSPwA4=",
 			"origin": "github.com/aws/aws-sdk-go/vendor/github.com/go-ini/ini",
 			"path": "github.com/go-ini/ini",
 			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
 			"revisionTime": "2017-05-16T20:59:04Z"
+		},
+		{
+			"checksumSHA1": "I2lXmuk1IHZmw+zDXgTGi0+LvpY=",
+			"path": "github.com/golang/mock/gomock",
+			"revision": "15f8b22550555c0d3edf5afa97d74001bda2208b",
+			"revisionTime": "2015-06-12T17:25:59Z"
 		},
 		{
 			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
@@ -203,6 +216,19 @@
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
 		{
+			"checksumSHA1": "zKKp5SZ3d3ycKe4EKMNT0BqAWBw=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "f6abca593680b2315d2075e0f5e2a9751e3f431a",
+			"revisionTime": "2017-06-01T20:57:54Z"
+		},
+		{
+			"checksumSHA1": "5NBHAe3S15q3L9hOLThnMZjIZRE=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "f6abca593680b2315d2075e0f5e2a9751e3f431a",
+			"revisionTime": "2017-06-01T20:57:54Z"
+		},
+		{
 			"checksumSHA1": "7cxwOBG3z8bcqlACknqxIV+jB/o=",
 			"path": "github.com/urfave/cli",
 			"revision": "f1be59ff3d239f0942b201619030d302bce912cc",
@@ -215,16 +241,22 @@
 			"revisionTime": "2017-04-10T20:56:13Z"
 		},
 		{
+			"checksumSHA1": "QeZ2xsLZBpItk0uZtsh1T7NofPg=",
+			"path": "github.com/zpatrick/go-cache",
+			"revision": "07dbf58cb418d923cced58e7201d742c6adb969d",
+			"revisionTime": "2017-06-17T15:00:56Z"
+		},
+		{
 			"checksumSHA1": "ToPsFeShbYoBMN3uHimpRb536GE=",
 			"path": "github.com/zpatrick/go-plugin-swagger",
 			"revision": "c139ec9f5696a2beeea758f7303b5311f91664c0",
 			"revisionTime": "2017-04-29T20:43:32Z"
 		},
 		{
-			"checksumSHA1": "vWRltn86dBjcd3cXvXqYPV/Y+xE=",
+			"checksumSHA1": "YLTesJKrzaqi/LDrtImc/O4JX94=",
 			"path": "github.com/zpatrick/rclient",
-			"revision": "970d4b3fda75b6144a9ff60ae9bfd4a6c752e7d5",
-			"revisionTime": "2017-06-21T22:46:25Z"
+			"revision": "8e281dcd539b2c8c180e999c6f97f472d8cbee32",
+			"revisionTime": "2017-06-22T21:53:04Z"
 		}
 	],
 	"rootPath": "github.com/quintilesims/d.ims.io"

@@ -1,23 +1,91 @@
 package auth
 
 import (
-	"log"
+	"fmt"
+	"time"
 
+	"github.com/zpatrick/go-cache"
 	"github.com/zpatrick/rclient"
 )
 
+var timeMultiplier = 1
+
 type Auth0Manager struct {
-	token  string
-	client *rclient.RestClient
+	clientID   string
+	connection string
+	client     *rclient.RestClient
+	cache      *cache.Cache
 }
 
-func NewAuth0Manager(endpoint, token string) *Auth0Manager {
+type oauthReq struct {
+	ClientID   string `json:"client_id"`
+	Connection string `json:"connection"`
+	Username   string `json:"username"`
+	Password   string `json:"password"`
+	GrantType  string `json:"grant_type"`
+	Scope      string `json:"scope"`
+}
+
+type authStatus struct {
+	isValid bool
+	penalty time.Duration
+}
+
+const (
+	maxPenalty      = 5 * time.Second
+	validAuthExpiry = 1 * time.Hour
+)
+
+func NewAuth0Manager(domain, clientID, connection string) *Auth0Manager {
 	return &Auth0Manager{
-		client: rclient.NewRestClient(endpoint),
+		clientID:   clientID,
+		connection: connection,
+		client:     rclient.NewRestClient(domain),
+		cache:      cache.New(),
 	}
 }
 
-func (a *Auth0Manager) Authenticate(user, pass string) (bool, error) {
-	log.Println("[ERROR] - Auth0Manager.Authenticate not implemented")
+func (a *Auth0Manager) Authenticate(username, password string) (bool, error) {
+	key := fmt.Sprintf("%s:%s", username, password)
+	var cachedStatus *authStatus
+	if result, exists := a.cache.Getf(key); exists {
+		cachedStatus = result.(*authStatus)
+	} else {
+		cachedStatus = &authStatus{}
+	}
+
+	if cachedStatus.isValid {
+		return true, nil
+	}
+
+	// will only sleep if cachedStatus already exists with a penalty
+	time.Sleep(cachedStatus.penalty * time.Duration(timeMultiplier))
+
+	req := oauthReq{
+		ClientID:   a.clientID,
+		Connection: a.connection,
+		Username:   username,
+		Password:   password,
+		GrantType:  "password",
+		Scope:      "openid",
+	}
+
+	if err := a.client.Post("/oauth/ro", req, nil); err != nil {
+		if err, ok := err.(*rclient.ResponseError); ok && err.Response.StatusCode == 401 {
+			cachedStatus.penalty += time.Second
+			if cachedStatus.penalty > maxPenalty {
+				cachedStatus.penalty = maxPenalty
+			}
+
+			a.cache.Add(key, cachedStatus)
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	cachedStatus.isValid = true
+	cachedStatus.penalty = 0 * time.Second
+	a.cache.Addf(key, cachedStatus, validAuthExpiry)
 	return true, nil
 }

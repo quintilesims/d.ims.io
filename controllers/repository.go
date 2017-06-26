@@ -76,7 +76,7 @@ func (r *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.R
 		return nil, err
 	}
 
-	return fireball.NewJSONResponse(200, nil)
+	return fireball.NewResponse(200, []byte("Successfully deleted repository"), nil), nil
 }
 
 func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Response, error) {

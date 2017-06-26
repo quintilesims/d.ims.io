@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
-
 	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -73,6 +72,19 @@ func main() {
 			Name:   "registry-endpoint",
 			EnvVar: config.ENVVAR_REGISTRY_ENDPOINT,
 		},
+		cli.StringFlag{
+			Name:   "auth0-domain",
+			Value:  config.DEFAULT_AUTH0_DOMAIN,
+			EnvVar: config.ENVVAR_AUTH0_DOMAIN,
+		},
+		cli.StringFlag{
+			Name:   "auth0-client-id",
+			EnvVar: config.ENVVAR_AUTH0_CLIENT_ID,
+		},
+		cli.StringFlag{
+			Name:   "auth0-connection",
+			EnvVar: config.ENVVAR_AUTH0_CONNECTION,
+		},
 	}
 
 	app.Before = func(c *cli.Context) error {
@@ -89,8 +101,11 @@ func main() {
 		dynamodb := dynamodb.New(session)
 		ecr := ecr.New(session)
 
-		tokenManager := auth.NewDynamoTokenManager("todo = table name", dynamodb)
-		auth0Manager := auth.NewAuth0Manager("todo - auth0 endpoint", "todo - auth0 token")
+		tokenManager := auth.NewDynamoTokenManager(c.String("dynamo-table"), dynamodb)
+		// todo: terraform module will need https in front of domain
+		auth0Manager := auth.NewAuth0Manager(c.String("auth0-domain"),
+			c.String("auth0-client-id"),
+			c.String("auth0-connection"))
 		proxy := proxy.NewECRProxy(c.String("registry-endpoint"))
 
 		rootController := controllers.NewRootController()
@@ -136,6 +151,9 @@ func validateConfig(c *cli.Context) error {
 		"aws-region":        fmt.Errorf("AWS Region not set! (EnvVar: %s)", config.ENVVAR_AWS_REGION),
 		"dynamo-table":      fmt.Errorf("Dynamo Table not set! (EnvVar: %s)", config.ENVVAR_DYNAMO_TABLE),
 		"registry-endpoint": fmt.Errorf("Registry endpoint not set! (EnvVar: %s)", config.ENVVAR_REGISTRY_ENDPOINT),
+		"auth0-domain":      fmt.Errorf("Auth0 Domain not set! (EnvVar: %s)", config.ENVVAR_AUTH0_DOMAIN),
+		"auth0-client-id":   fmt.Errorf("Auth0 Client ID not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CLIENT_ID),
+		"auth0-connection":  fmt.Errorf("Auth0 Connection not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CONNECTION),
 	}
 
 	for name, err := range vars {
