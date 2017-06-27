@@ -170,9 +170,11 @@ func (r *RepositoryController) ListOwnerRepositories(c *fireball.Context) (fireb
 	repositories := []string{}
 	fn := func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
 		for _, repository := range output.Repositories {
+			prefix := fmt.Sprintf("%s/", owner)
 			repositoryName := aws.StringValue(repository.RepositoryName)
-			if strings.HasPrefix(repositoryName, fmt.Sprintf("%s/", owner)) {
-				repositories = append(repositories, repositoryName)
+
+			if strings.HasPrefix(repositoryName, prefix) {
+				repositories = append(repositories, strings.TrimPrefix(repositoryName, prefix))
 			}
 		}
 

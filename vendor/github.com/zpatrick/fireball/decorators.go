@@ -1,10 +1,11 @@
 package fireball
 
 import (
-	"github.com/gorilla/sessions"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/sessions"
 )
 
 // A Decorator wraps logic around a Handler
