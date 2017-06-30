@@ -107,16 +107,16 @@ func main() {
 			c.String("auth0-connection"))
 
 		authenticator := auth.NewCompositeAuthenticator(tokenManager, auth0Manager)
-		proxy := proxy.NewECRProxy(c.String("registry-endpoint"), authenticator)
+		proxy := proxy.NewECRProxy(c.String("registry-endpoint"))
 
-		//rootController := controllers.NewRootController()
+		rootController := controllers.NewRootController()
 		repositoryController := controllers.NewRepositoryController(ecr)
 		tokenController := controllers.NewTokenController(tokenManager)
 		proxyController := controllers.NewProxyController(ecr, proxy)
 		swaggerController := controllers.NewSwaggerController(c.String("swagger-host"))
 
-		//routes := rootController.Routes()
-		routes := repositoryController.Routes()
+		routes := rootController.Routes()
+		routes = append(routes, repositoryController.Routes()...)
 		routes = append(routes, tokenController.Routes()...)
 		routes = append(routes, swaggerController.Routes()...)
 		routes = fireball.Decorate(routes,
@@ -126,8 +126,8 @@ func main() {
 		fb := fireball.NewApp(routes)
 
 		// decorate proxy handler with auth
-		//doProxy := controllers.AuthDecorator(authenticator)(proxyController.DoProxy)
-		fb.Router = router.NewRouter(routes, proxyController.DoProxy)
+		doProxy := controllers.AuthDecorator(authenticator)(proxyController.DoProxy)
+		fb.Router = router.NewRouter(routes, doProxy)
 
 		port := fmt.Sprintf(":%s", c.String("port"))
 		log.Printf("[INFO] Running on port %s\n", port)
