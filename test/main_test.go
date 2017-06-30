@@ -2,15 +2,17 @@ package main
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 	"testing"
 
 	"github.com/docker/docker/pkg/homedir"
 	"github.com/quintilesims/d.ims.io/models"
-	"github.com/quintilesims/layer0/setup/docker"
 	"github.com/zpatrick/rclient"
 )
 
@@ -33,14 +35,10 @@ func Token() string {
 	return os.Getenv(ENVVAR_TOKEN)
 }
 
-func RepositoryNames() []string {
-	return []string{"small", "medium", "large"}
-}
-
 func TestMain(m *testing.M) {
 	setup()
+	fmt.Println("[INFO] Starting stress test")
 	code := m.Run()
-	teardown()
 	os.Exit(code)
 }
 
@@ -55,26 +53,37 @@ func setup() {
 		os.Exit(1)
 	}
 
+	fmt.Println("[INFO] Setting docker authentication")
 	if err := setDockerToken(); err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
+	fmt.Println("[INFO] Clearing test repositories")
 	if err := clearTestRepos(); err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 }
 
+// setDockerToken adds the authentication for the registry into ~/.docker/config.json
 func setDockerToken() error {
-	path := fmt.Sprintf("%s/.docker/config.json", homedir.Get())
-	config, err := docker.LoadConfig(path)
-	if err != nil && !os.IsNotExist(err) {
-		return err
+	config := struct {
+		Auths map[string]interface{} `json:"auths"`
+	}{
+		Auths: map[string]interface{}{},
 	}
 
-	if config == nil {
-		config = &docker.Config{Auths: map[string]docker.Auth{}}
+	path := fmt.Sprintf("%s/.docker/config.json", homedir.Get())
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		data, err := ioutil.ReadFile(path)
+		if err != nil {
+			return err
+		}
+
+		if err := json.Unmarshal(data, &config); err != nil {
+			return err
+		}
 	}
 
 	endpoint := Endpoint(false)
@@ -82,10 +91,18 @@ func setDockerToken() error {
 		config.Auths[endpoint] = map[string]interface{}{}
 	}
 
-	config.Auths[endpoint]["auth"] = Token()
-	return docker.WriteConfig(path, config)
+	config.Auths[endpoint].(map[string]interface{})["auth"] = Token()
+
+	data, err := json.MarshalIndent(config, "", "    ")
+	if err != nil {
+		return nil
+	}
+
+	return ioutil.WriteFile(path, data, 0600)
 }
 
+// clearTestRepos removes all repositories owned by the TEST_REPO_OWNER
+// and (re)creates the repositories 'small', 'medium', and 'large' for the same owner
 func clearTestRepos() error {
 	doer := &http.Client{Transport: &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -121,5 +138,17 @@ func clearTestRepos() error {
 	return nil
 }
 
-func teardown() {
+func shell(t *testing.T, format string, tokens ...interface{}) {
+	args := strings.Split(fmt.Sprintf(format, tokens...), " ")
+	cmd := exec.Command(args[0], args[1:]...)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		text := fmt.Sprintf("Error running %v: %v\n", cmd.Args, err)
+		for _, line := range strings.Split(string(output), "\n") {
+			text += line + "\n"
+		}
+
+		t.Fatalf(text)
+	}
 }

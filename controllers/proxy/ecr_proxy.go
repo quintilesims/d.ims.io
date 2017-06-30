@@ -6,9 +6,11 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/quintilesims/d.ims.io/auth"
 )
 
-func NewECRProxy(registryEndpoint string) ProxyFunc {
+func NewECRProxy(registryEndpoint string, a auth.Authenticator) ProxyFunc {
 	reverseProxy := httputil.NewSingleHostReverseProxy(&url.URL{
 		Host:   registryEndpoint,
 		Scheme: "https",

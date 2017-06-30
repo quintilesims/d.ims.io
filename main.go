@@ -102,22 +102,21 @@ func main() {
 		ecr := ecr.New(session)
 
 		tokenManager := auth.NewDynamoTokenManager(c.String("dynamo-table"), dynamodb)
-		// todo: terraform module will need https in front of domain
 		auth0Manager := auth.NewAuth0Manager(c.String("auth0-domain"),
 			c.String("auth0-client-id"),
 			c.String("auth0-connection"))
-		proxy := proxy.NewECRProxy(c.String("registry-endpoint"))
 
-		rootController := controllers.NewRootController()
+		authenticator := auth.NewCompositeAuthenticator(tokenManager, auth0Manager)
+		proxy := proxy.NewECRProxy(c.String("registry-endpoint"), authenticator)
+
+		//rootController := controllers.NewRootController()
 		repositoryController := controllers.NewRepositoryController(ecr)
 		tokenController := controllers.NewTokenController(tokenManager)
 		proxyController := controllers.NewProxyController(ecr, proxy)
 		swaggerController := controllers.NewSwaggerController(c.String("swagger-host"))
 
-		authenticator := auth.NewCompositeAuthenticator(tokenManager, auth0Manager)
-
-		routes := rootController.Routes()
-		routes = append(routes, repositoryController.Routes()...)
+		//routes := rootController.Routes()
+		routes := repositoryController.Routes()
 		routes = append(routes, tokenController.Routes()...)
 		routes = append(routes, swaggerController.Routes()...)
 		routes = fireball.Decorate(routes,
@@ -127,8 +126,8 @@ func main() {
 		fb := fireball.NewApp(routes)
 
 		// decorate proxy handler with auth
-		doProxy := controllers.AuthDecorator(authenticator)(proxyController.DoProxy)
-		fb.Router = router.NewRouter(routes, doProxy)
+		//doProxy := controllers.AuthDecorator(authenticator)(proxyController.DoProxy)
+		fb.Router = router.NewRouter(routes, proxyController.DoProxy)
 
 		port := fmt.Sprintf(":%s", c.String("port"))
 		log.Printf("[INFO] Running on port %s\n", port)

@@ -22,5 +22,6 @@ func (r *RootController) Routes() []*fireball.Route {
 }
 
 func (r *RootController) GetRoot(c *fireball.Context) (fireball.Response, error) {
-	return fireball.Redirect(301, "/api/?url=/swagger.json"), nil
+	return fireball.NewResponse(200, nil, nil), nil
+	//return fireball.Redirect(301, "/api/?url=/swagger.json"), nil
 }
