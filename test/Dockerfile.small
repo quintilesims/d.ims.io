@@ -1,2 +1,0 @@
-FROM alpine
-RUN truncate -s 100MB file

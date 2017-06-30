@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
 	"os/exec"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/docker/docker/pkg/homedir"
 	"github.com/quintilesims/d.ims.io/models"
@@ -36,6 +38,8 @@ func Token() string {
 }
 
 func TestMain(m *testing.M) {
+	rand.Seed(time.Now().Unix())
+
 	setup()
 	fmt.Println("[INFO] Starting stress test")
 	code := m.Run()
@@ -101,8 +105,20 @@ func setDockerToken() error {
 	return ioutil.WriteFile(path, data, 0600)
 }
 
-// clearTestRepos removes all repositories owned by the TEST_REPO_OWNER
-// and (re)creates the repositories 'small', 'medium', and 'large' for the same owner
+func newClient() *rclient.RestClient {
+	doer := &http.Client{Transport: &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}}
+
+	addAuth := rclient.Header("Authorization", fmt.Sprintf("Basic %s", Token()))
+
+	return rclient.NewRestClient(Endpoint(true),
+		rclient.Doer(doer),
+		rclient.RequestOptions(addAuth))
+
+}
+
+// todo: use clinet.APIClient
 func clearTestRepos() error {
 	doer := &http.Client{Transport: &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -123,14 +139,6 @@ func clearTestRepos() error {
 	for _, name := range resp.Repositories {
 		path := fmt.Sprintf("/repository/%s/%s", TEST_REPO_OWNER, name)
 		if err := client.Delete(path, nil, nil); err != nil {
-			return err
-		}
-	}
-
-	for _, name := range []string{"small", "medium", "large"} {
-		req := models.CreateRepositoryRequest{Name: name}
-		path := fmt.Sprintf("/repository/%s", TEST_REPO_OWNER)
-		if err := client.Post(path, req, nil); err != nil {
 			return err
 		}
 	}
