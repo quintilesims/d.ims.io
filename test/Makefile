@@ -1,4 +1,9 @@
-test:
-	go test -timeout 5m -v -count 2
+test-small:
+	go test -parallel 3 -count 1
 
-.PHONY: test
+test-large:
+	go test -parallel 10 -count 3
+
+test: test-small
+
+.PHONY: test-small test-large test

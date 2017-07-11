@@ -37,3 +37,10 @@ func (a *TestAPIClient) CreateRepository(owner, name string) {
 		a.T.Fatal(err)
 	}
 }
+
+func (a *TestAPIClient) DeleteRepository(owner, name string) {
+	path := fmt.Sprintf("/repository/%s/%s", owner, name)
+	if err := a.Client.Delete(path, nil, nil); err != nil {
+		a.T.Fatal(err)
+	}
+}

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -31,6 +33,17 @@ func Token() string {
 	return os.Getenv(ENVVAR_TOKEN)
 }
 
+func Count() int {
+	p := flag.Lookup("test.parallel")
+	count, err := strconv.Atoi(p.Value.String())
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to parse -parallel flag: %v", err)
+		os.Exit(1)
+	}
+
+	return count
+}
+
 func TestMain(m *testing.M) {
 	rand.Seed(time.Now().Unix())
 
@@ -41,6 +54,8 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
+	flag.Parse()
+
 	if Endpoint(true) == "" {
 		fmt.Printf("Required environment variable %s not set\n", ENVVAR_ENDPOINT)
 		os.Exit(1)

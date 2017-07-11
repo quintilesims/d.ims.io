@@ -8,7 +8,7 @@ import (
 	"github.com/quintilesims/d.ims.io/test/helpers"
 )
 
-func getRandomRepo() (string, string) {
+func newRepoGenerator() func() (string, string, string) {
 	nato := []string{
 		"alpha",
 		"bravo",
@@ -38,26 +38,45 @@ func getRandomRepo() (string, string) {
 		"zulu",
 	}
 
-	name := nato[rand.Intn(len(nato)-1)]
-	tag := fmt.Sprintf("%s/%s/%s", Endpoint(false), TEST_REPO_OWNER, name)
-	return name, tag
+	var i int
+	return func() (string, string, string) {
+		name := nato[i%len(nato)]
+		tag := fmt.Sprintf("%s/%s/%s", Endpoint(false), TEST_REPO_OWNER, name)
+		size := fmt.Sprintf("%dMB", rand.Intn(1000))
+
+		i++
+		return name, tag, size
+	}
 }
 
-func TestSimpleWorkflow(t *testing.T) {
-	api := helpers.NewTestAPIClient(t, Endpoint(true), Token())
-	docker := helpers.NewTestDockerClient(t)
+func TestStress(t *testing.T) {
+	repoGenerator := newRepoGenerator()
 
-	name, tag := getRandomRepo()
-	api.CreateRepository(TEST_REPO_OWNER, name)
+	for i := 0; i < Count(); i++ {
+		name, tag, size := repoGenerator()
 
-	size := fmt.Sprintf("%dMB", rand.Intn(1000))
-	docker.Build(tag, map[string]string{"size": size})
+		t.Run(name, func(tt *testing.T) {
+			tt.Parallel()
 
-	t.Logf("Pushing %s image to %s", size, tag)
-	docker.Push(tag)
+			api := helpers.NewTestAPIClient(tt, Endpoint(true), Token())
+			docker := helpers.NewTestDockerClient(tt)
 
-	docker.RMI(tag)
+			tt.Logf("Creating repository %s", name)
+			api.CreateRepository(TEST_REPO_OWNER, name)
 
-	t.Logf("Pulling image %s", tag)
-	docker.Pull(tag)
+			tt.Logf("Building image %s", tag)
+			docker.Build(tag, map[string]string{"size": size})
+
+			tt.Logf("Pushing %s image to %s", size, tag)
+			docker.Push(tag)
+
+			tt.Logf("Pulling image %s", tag)
+			docker.RMI(tag)
+			docker.Pull(tag)
+
+			tt.Logf("Deleting repository %s", name)
+			api.DeleteRepository(TEST_REPO_OWNER, name)
+			docker.RMI(tag)
+		})
+	}
 }
