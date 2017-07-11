@@ -66,7 +66,6 @@ func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.R
 		return nil, fireball.NewError(400, err, nil)
 	}
 
-	// todo: handle already exists error
 	if _, err := r.ecr.CreateRepository(input); err != nil {
 		return nil, err
 	}
