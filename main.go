@@ -123,6 +123,7 @@ func main() {
 			fireball.LogDecorator(),
 			controllers.AuthDecorator(authenticator))
 
+		routes = fireball.EnableCORS(routes)
 		fb := fireball.NewApp(routes)
 
 		// decorate proxy handler with auth
