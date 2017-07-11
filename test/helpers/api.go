@@ -1,4 +1,4 @@
-package client
+package helpers
 
 import (
 	"crypto/tls"
@@ -12,7 +12,7 @@ import (
 
 type TestAPIClient struct {
 	T      *testing.T
-	client *rclient.RestClient
+	Client *rclient.RestClient
 }
 
 func NewTestAPIClient(t *testing.T, endpoint, token string) *TestAPIClient {
@@ -26,14 +26,14 @@ func NewTestAPIClient(t *testing.T, endpoint, token string) *TestAPIClient {
 
 	return &TestAPIClient{
 		T:      t,
-		client: client,
+		Client: client,
 	}
 }
 
 func (a *TestAPIClient) CreateRepository(owner, name string) {
 	req := models.CreateRepositoryRequest{Name: name}
 	path := fmt.Sprintf("/repository/%s", owner)
-	if err := a.client.Post(path, req, nil); err != nil {
+	if err := a.Client.Post(path, req, nil); err != nil {
 		a.T.Fatal(err)
 	}
 }

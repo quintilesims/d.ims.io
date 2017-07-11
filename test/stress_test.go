@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/quintilesims/d.ims.io/test/client"
-
 	"math/rand"
 	"testing"
+
+	"github.com/quintilesims/d.ims.io/test/helpers"
 )
 
 func getRandomRepo() (string, string) {
@@ -16,7 +15,7 @@ func getRandomRepo() (string, string) {
 		"charlie",
 		"delta",
 		"echo",
-		"foxtrop",
+		"foxtrot",
 		"golf",
 		"hotel",
 		"india",
@@ -44,12 +43,10 @@ func getRandomRepo() (string, string) {
 	return name, tag
 }
 
-// todo: stres test  pull
-func TestStressPush(t *testing.T) {
-	api := client.NewTestAPIClient(t, Endpoint(true), Token())
-	docker := client.NewTestDockerClient(t)
+func TestSimpleWorkflow(t *testing.T) {
+	api := helpers.NewTestAPIClient(t, Endpoint(true), Token())
+	docker := helpers.NewTestDockerClient(t)
 
-	for i := 0; i < 5; i++ {
 	name, tag := getRandomRepo()
 	api.CreateRepository(TEST_REPO_OWNER, name)
 
@@ -58,7 +55,9 @@ func TestStressPush(t *testing.T) {
 
 	t.Logf("Pushing %s image to %s", size, tag)
 	docker.Push(tag)
-	}
 
+	docker.RMI(tag)
+
+	t.Logf("Pulling image %s", tag)
+	docker.Pull(tag)
 }
-

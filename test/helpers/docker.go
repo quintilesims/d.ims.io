@@ -1,4 +1,4 @@
-package client
+package helpers
 
 import (
 	"fmt"
@@ -30,6 +30,16 @@ func (d *TestDockerClient) Build(tag string, buildArgs map[string]string) {
 
 func (d *TestDockerClient) Push(tag string) {
 	command := fmt.Sprintf("docker push %s", tag)
+	shell(d.T, command)
+}
+
+func (d *TestDockerClient) Pull(tag string) {
+	command := fmt.Sprintf("docker pull %s", tag)
+	shell(d.T, command)
+}
+
+func (d *TestDockerClient) RMI(tag string) {
+	command := fmt.Sprintf("docker rmi %s", tag)
 	shell(d.T, command)
 }
 

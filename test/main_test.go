@@ -1,21 +1,15 @@
 package main
 
 import (
-	"crypto/tls"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
-	"net/http"
 	"os"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/docker/docker/pkg/homedir"
 	"github.com/quintilesims/d.ims.io/models"
-	"github.com/zpatrick/rclient"
+	"github.com/quintilesims/d.ims.io/test/helpers"
 )
 
 const (
@@ -57,12 +51,6 @@ func setup() {
 		os.Exit(1)
 	}
 
-	fmt.Println("[INFO] Setting docker authentication")
-	if err := setDockerToken(); err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
 	fmt.Println("[INFO] Clearing test repositories")
 	if err := clearTestRepos(); err != nil {
 		fmt.Println(err.Error())
@@ -70,93 +58,21 @@ func setup() {
 	}
 }
 
-// setDockerToken adds the authentication for the registry into ~/.docker/config.json
-func setDockerToken() error {
-	config := struct {
-		Auths map[string]interface{} `json:"auths"`
-	}{
-		Auths: map[string]interface{}{},
-	}
-
-	path := fmt.Sprintf("%s/.docker/config.json", homedir.Get())
-	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		data, err := ioutil.ReadFile(path)
-		if err != nil {
-			return err
-		}
-
-		if err := json.Unmarshal(data, &config); err != nil {
-			return err
-		}
-	}
-
-	endpoint := Endpoint(false)
-	if _, ok := config.Auths[endpoint]; !ok {
-		config.Auths[endpoint] = map[string]interface{}{}
-	}
-
-	config.Auths[endpoint].(map[string]interface{})["auth"] = Token()
-
-	data, err := json.MarshalIndent(config, "", "    ")
-	if err != nil {
-		return nil
-	}
-
-	return ioutil.WriteFile(path, data, 0600)
-}
-
-func newClient() *rclient.RestClient {
-	doer := &http.Client{Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}}
-
-	addAuth := rclient.Header("Authorization", fmt.Sprintf("Basic %s", Token()))
-
-	return rclient.NewRestClient(Endpoint(true),
-		rclient.Doer(doer),
-		rclient.RequestOptions(addAuth))
-
-}
-
-// todo: use clinet.APIClient
 func clearTestRepos() error {
-	doer := &http.Client{Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}}
-
-	addAuth := rclient.Header("Authorization", fmt.Sprintf("Basic %s", Token()))
-
-	client := rclient.NewRestClient(Endpoint(true),
-		rclient.Doer(doer),
-		rclient.RequestOptions(addAuth))
+	api := helpers.NewTestAPIClient(nil, Endpoint(true), Token())
 
 	var resp models.ListRepositoriesResponse
 	path := fmt.Sprintf("/repository/%s", TEST_REPO_OWNER)
-	if err := client.Get(path, &resp); err != nil {
+	if err := api.Client.Get(path, &resp); err != nil {
 		return err
 	}
 
 	for _, name := range resp.Repositories {
 		path := fmt.Sprintf("/repository/%s/%s", TEST_REPO_OWNER, name)
-		if err := client.Delete(path, nil, nil); err != nil {
+		if err := api.Client.Delete(path, nil, nil); err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-func shell(t *testing.T, format string, tokens ...interface{}) {
-	args := strings.Split(fmt.Sprintf(format, tokens...), " ")
-	cmd := exec.Command(args[0], args[1:]...)
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		text := fmt.Sprintf("Error running %v: %v\n", cmd.Args, err)
-		for _, line := range strings.Split(string(output), "\n") {
-			text += line + "\n"
-		}
-
-		t.Fatalf(text)
-	}
 }
