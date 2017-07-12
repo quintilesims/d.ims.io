@@ -52,7 +52,7 @@ func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.R
 
 	var req models.CreateRepositoryRequest
 	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
-		return nil, err
+		return fireball.NewJSONError(400, err)
 	}
 
 	if err := req.Validate(); err != nil {
@@ -88,7 +88,7 @@ func (r *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.R
 	input.SetForce(true)
 
 	if err := input.Validate(); err != nil {
-		return nil, err
+		return fireball.NewJSONError(400, err)
 	}
 
 	if _, err := r.ecr.DeleteRepository(input); err != nil {
@@ -106,7 +106,7 @@ func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Resp
 	input := &ecr.DescribeImagesInput{}
 	input.SetRepositoryName(repo)
 	if err := input.Validate(); err != nil {
-		return nil, err
+		return fireball.NewJSONError(400, err)
 	}
 
 	tags := []string{}
@@ -136,7 +136,7 @@ func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Resp
 func (r *RepositoryController) ListRepositories(c *fireball.Context) (fireball.Response, error) {
 	input := &ecr.DescribeRepositoriesInput{}
 	if err := input.Validate(); err != nil {
-		return nil, err
+		return fireball.NewJSONError(400, err)
 	}
 
 	repositories := []string{}
@@ -164,15 +164,17 @@ func (r *RepositoryController) ListOwnerRepositories(c *fireball.Context) (fireb
 
 	input := &ecr.DescribeRepositoriesInput{}
 	if err := input.Validate(); err != nil {
-		return nil, err
+		return fireball.NewJSONError(400, err)
 	}
 
 	repositories := []string{}
 	fn := func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
 		for _, repository := range output.Repositories {
+			prefix := fmt.Sprintf("%s/", owner)
 			repositoryName := aws.StringValue(repository.RepositoryName)
-			if strings.HasPrefix(repositoryName, fmt.Sprintf("%s/", owner)) {
-				repositories = append(repositories, repositoryName)
+
+			if strings.HasPrefix(repositoryName, prefix) {
+				repositories = append(repositories, strings.TrimPrefix(repositoryName, prefix))
 			}
 		}
 
