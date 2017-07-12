@@ -14,7 +14,8 @@ You must create a new repository for each image you want to host.
 Creating new repositories can be done through the [Swagger UI](https://d.ims.io/api/?url=/swagger.json).
 
 Each image must have both an `owner` and a `name`.
-Images are referenced by `d.ims.io/<team>/<name>`. 
+An `owner` is typically the name of the team you are own. 
+Images are referenced by `d.ims.io/<owner>/<name>`. 
 
 For example, if team `carbon` created a `redis` image, images could be pushed via:
 ```
