@@ -56,9 +56,7 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 					Tags:     []string{"Token"},
 					Summary:  "Create a new Token",
 					Security: swagger.BasicAuthSecurity("login"),
-					Parameters: []swagger.Parameter{
-						swagger.NewBodyParam("CreateTokenRequest", "none", true),
-					},
+					Parameters: []swagger.Parameter{},
 					Responses: map[string]swagger.Response{
 						"200": {
 							Description: "success",
@@ -161,7 +159,6 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 		Definitions: map[string]swagger.Definition{
 			"CreateRepositoryRequest":  models.CreateRepositoryRequest{}.Definition(),
 			"CreateRepositoryResponse": models.CreateRepositoryResponse{}.Definition(),
-			"CreateTokenRequest":       models.CreateTokenRequest{}.Definition(),
 			"CreateTokenResponse":      models.CreateTokenResponse{}.Definition(),
 			"ListRepositoriesResponse": models.ListRepositoriesResponse{}.Definition(),
 			"Repository":               models.Repository{}.Definition(),
