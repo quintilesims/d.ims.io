@@ -57,13 +57,13 @@ func setup() {
 	flag.Parse()
 
 	if Endpoint(true) == "" {
-		fmt.Printf("Required environment variable %s not set\n", ENVVAR_ENDPOINT)
-		os.Exit(1)
+		fmt.Printf("Required environment variable %s not set. Skipping test.\n", ENVVAR_ENDPOINT)
+		os.Exit(0)
 	}
 
 	if Token() == "" {
-		fmt.Printf("Required environment variable %s not set\n", ENVVAR_TOKEN)
-		os.Exit(1)
+		fmt.Printf("Required environment variable %s not set. Skipping test.\n", ENVVAR_TOKEN)
+		os.Exit(0)
 	}
 
 	fmt.Println("[INFO] Clearing test repositories")
