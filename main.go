@@ -102,10 +102,11 @@ func main() {
 		ecr := ecr.New(session)
 
 		tokenManager := auth.NewDynamoTokenManager(c.String("dynamo-table"), dynamodb)
-		// todo: terraform module will need https in front of domain
 		auth0Manager := auth.NewAuth0Manager(c.String("auth0-domain"),
 			c.String("auth0-client-id"),
 			c.String("auth0-connection"))
+
+		authenticator := auth.NewCompositeAuthenticator(tokenManager, auth0Manager)
 		proxy := proxy.NewECRProxy(c.String("registry-endpoint"))
 
 		rootController := controllers.NewRootController()
@@ -113,8 +114,6 @@ func main() {
 		tokenController := controllers.NewTokenController(tokenManager)
 		proxyController := controllers.NewProxyController(ecr, proxy)
 		swaggerController := controllers.NewSwaggerController(c.String("swagger-host"))
-
-		authenticator := auth.NewCompositeAuthenticator(tokenManager, auth0Manager)
 
 		routes := rootController.Routes()
 		routes = append(routes, repositoryController.Routes()...)
@@ -124,6 +123,7 @@ func main() {
 			fireball.LogDecorator(),
 			controllers.AuthDecorator(authenticator))
 
+		routes = fireball.EnableCORS(routes)
 		fb := fireball.NewApp(routes)
 
 		// decorate proxy handler with auth
