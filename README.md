@@ -15,6 +15,7 @@ Creating new repositories can be done through the [Swagger UI](https://d.ims.io/
 
 Each image must have both an `owner` and a `name`.
 An `owner` is typically the name of the team you are own. 
+A `name` cannot contain any slash characters (`/`).
 Images are referenced by `d.ims.io/<owner>/<name>`. 
 
 For example, if team `carbon` created a `redis` image, images could be pushed via:
