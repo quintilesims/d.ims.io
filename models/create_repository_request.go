@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/zpatrick/go-plugin-swagger"
 )
@@ -22,6 +23,10 @@ func (r CreateRepositoryRequest) Definition() swagger.Definition {
 func (r CreateRepositoryRequest) Validate() error {
 	if r.Name == "" {
 		return fmt.Errorf("Field 'name' is required")
+	}
+
+	if strings.ContainsAny(r.Name, "/") {
+		return fmt.Errorf("Field 'name' cannot contain '/' characters")
 	}
 
 	return nil
