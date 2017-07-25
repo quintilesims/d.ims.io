@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -30,6 +31,20 @@ func TestCreateRepository(t *testing.T) {
 
 	c := generateContext(t, models.CreateRepositoryRequest{Name: "test"}, map[string]string{"owner": "user"})
 	if _, err := controller.CreateRepository(c); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateRepositoryFailsWithSlashes(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockECR := mock.NewMockECRAPI(ctrl)
+	controller := NewRepositoryController(mockECR)
+
+	c := generateContext(t, models.CreateRepositoryRequest{Name: "slash/test"}, map[string]string{"owner": "user"})
+	_, err := controller.CreateRepository(c)
+	if !strings.ContainsAny(err.Error(), "cannot contain '/' characters") {
 		t.Fatal(err)
 	}
 }
