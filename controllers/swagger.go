@@ -49,13 +49,17 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 				Name:        "Repository",
 				Description: "Methods for Repositories",
 			},
+			{
+				Name:        "Image",
+				Description: "Methods for Images",
+			},
 		},
 		Paths: map[string]swagger.Path{
 			"/token": map[string]swagger.Method{
 				"post": {
-					Tags:     []string{"Token"},
-					Summary:  "Create a new Token",
-					Security: swagger.BasicAuthSecurity("login"),
+					Tags:       []string{"Token"},
+					Summary:    "Create a new Token",
+					Security:   swagger.BasicAuthSecurity("login"),
 					Parameters: []swagger.Parameter{},
 					Responses: map[string]swagger.Response{
 						"200": {
@@ -155,6 +159,19 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 					},
 				},
 			},
+			"/images": map[string]swagger.Method{
+				"get": {
+					Tags:     []string{"Images"},
+					Summary:  "List all images in the registry",
+					Security: swagger.BasicAuthSecurity("login"),
+					Responses: map[string]swagger.Response{
+						"200": {
+							Description: "success",
+							Schema:      swagger.NewObjectSchema("ListImagesResponse"),
+						},
+					},
+				},
+			},
 		},
 		Definitions: map[string]swagger.Definition{
 			"CreateRepositoryRequest":  models.CreateRepositoryRequest{}.Definition(),
@@ -162,6 +179,8 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 			"CreateTokenResponse":      models.CreateTokenResponse{}.Definition(),
 			"ListRepositoriesResponse": models.ListRepositoriesResponse{}.Definition(),
 			"Repository":               models.Repository{}.Definition(),
+			"ListImagesResponse":       models.ListImagesResponse{}.Definition(),
+			"Image":                    models.Image{}.Definition(),
 		},
 		SecurityDefinitions: map[string]swagger.SecurityDefinition{
 			"login": {
