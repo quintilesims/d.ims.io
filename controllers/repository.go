@@ -44,6 +44,19 @@ func (r *RepositoryController) Routes() []*fireball.Route {
 				"DELETE": r.DeleteRepository,
 			},
 		},
+		{
+			Path: "/repository/:owner/:name/image/:tag",
+			Handlers: fireball.Handlers{
+				"GET":    r.GetImage,
+				"DELETE": r.DeleteImage,
+			},
+		},
+		{
+			Path: "/images",
+			Handlers: fireball.Handlers{
+				"GET": r.ListImages,
+			},
+		},
 	}
 }
 
@@ -134,21 +147,8 @@ func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Resp
 }
 
 func (r *RepositoryController) ListRepositories(c *fireball.Context) (fireball.Response, error) {
-	input := &ecr.DescribeRepositoriesInput{}
-	if err := input.Validate(); err != nil {
-		return fireball.NewJSONError(400, err)
-	}
-
-	repositories := []string{}
-	fn := func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
-		for _, repository := range output.Repositories {
-			repositories = append(repositories, aws.StringValue(repository.RepositoryName))
-		}
-
-		return !lastPage
-	}
-
-	if err := r.ecr.DescribeRepositoriesPages(input, fn); err != nil {
+	repositories, err := r.listRepositories()
+	if err != nil {
 		return nil, err
 	}
 
@@ -190,4 +190,76 @@ func (r *RepositoryController) ListOwnerRepositories(c *fireball.Context) (fireb
 	}
 
 	return fireball.NewJSONResponse(200, resp)
+}
+
+func (r *RepositoryController) GetImage(c *fireball.Context) (fireball.Response, error) {
+	return fireball.NewJSONResponse(401, "Not yet implemented")
+}
+
+func (r *RepositoryController) DeleteImage(c *fireball.Context) (fireball.Response, error) {
+	return fireball.NewJSONResponse(401, "Not yet implemented")
+}
+
+func (r *RepositoryController) ListImages(c *fireball.Context) (fireball.Response, error) {
+	repositories, err := r.listRepositories()
+	if err != nil {
+		return nil, err
+	}
+
+	images := []models.Image{}
+	for _, repository := range repositories {
+		input := &ecr.DescribeImagesInput{}
+		input.SetRepositoryName(repository)
+		if err := input.Validate(); err != nil {
+			return fireball.NewJSONError(400, err)
+		}
+
+		fn := func(output *ecr.DescribeImagesOutput, lastPage bool) bool {
+			for _, detail := range output.ImageDetails {
+				image := models.Image{}
+				image.Repository = repository
+				image.ImageTags = []string{}
+				for _, tag := range detail.ImageTags {
+					image.ImageTags = append(image.ImageTags, *tag)
+				}
+				image.ImageDigest = *detail.ImageDigest
+				image.ImagePushedAt = *detail.ImagePushedAt
+				images = append(images, image)
+			}
+
+			return !lastPage
+		}
+
+		if err := r.ecr.DescribeImagesPages(input, fn); err != nil {
+			return nil, err
+		}
+	}
+
+	resp := models.ListImagesResponse{
+		Images: images,
+	}
+
+	return fireball.NewJSONResponse(200, resp)
+}
+
+func (r *RepositoryController) listRepositories() ([]string, error) {
+	input := &ecr.DescribeRepositoriesInput{}
+	if err := input.Validate(); err != nil {
+		return nil, err
+	}
+
+	repositories := []string{}
+	fn := func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
+		for _, repository := range output.Repositories {
+			repositories = append(repositories, aws.StringValue(repository.RepositoryName))
+		}
+
+		return !lastPage
+	}
+
+	if err := r.ecr.DescribeRepositoriesPages(input, fn); err != nil {
+		return nil, err
+	}
+
+	return repositories, nil
 }
