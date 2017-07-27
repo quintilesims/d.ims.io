@@ -162,7 +162,7 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 			"/images": map[string]swagger.Method{
 				"get": {
 					Tags:     []string{"Image"},
-					Summary:  "List all images in the registry",
+					Summary:  "List all Images",
 					Security: swagger.BasicAuthSecurity("login"),
 					Responses: map[string]swagger.Response{
 						"200": {
@@ -173,9 +173,25 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 				},
 			},
 			"/repository/{owner}/{name}/image/{tag}": map[string]swagger.Method{
+				"get": {
+					Tags:    []string{"Image"},
+					Summary: "Describe an Image",
+					Parameters: []swagger.Parameter{
+						swagger.NewStringPathParam("owner", "Owner of the Repository", true),
+						swagger.NewStringPathParam("name", "Name of the Repository", true),
+						swagger.NewStringPathParam("tag", "Tag of the Image to delete", true),
+					},
+					Security: swagger.BasicAuthSecurity("login"),
+					Responses: map[string]swagger.Response{
+						"200": {
+							Description: "success",
+							Schema:      swagger.NewObjectSchema("Image"),
+						},
+					},
+				},
 				"delete": {
 					Tags:    []string{"Image"},
-					Summary: "Delete an image, given its tag",
+					Summary: "Delete an Image",
 					Parameters: []swagger.Parameter{
 						swagger.NewStringPathParam("owner", "Owner of the Repository", true),
 						swagger.NewStringPathParam("name", "Name of the Repository", true),

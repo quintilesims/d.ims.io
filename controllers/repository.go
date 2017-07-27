@@ -193,7 +193,43 @@ func (r *RepositoryController) ListOwnerRepositories(c *fireball.Context) (fireb
 }
 
 func (r *RepositoryController) GetImage(c *fireball.Context) (fireball.Response, error) {
-	return fireball.NewJSONResponse(401, "Not yet implemented")
+	owner := c.PathVariables["owner"]
+	name := c.PathVariables["name"]
+	repo := fmt.Sprintf("%s/%s", owner, name)
+	tag := c.PathVariables["tag"]
+
+	imageID := &ecr.ImageIdentifier{}
+	imageID.SetImageTag(tag)
+
+	imageIDs := []*ecr.ImageIdentifier{}
+	imageIDs = append(imageIDs, imageID)
+
+	input := &ecr.DescribeImagesInput{}
+	input.SetRepositoryName(repo)
+	input.SetImageIds(imageIDs)
+	if err := input.Validate(); err != nil {
+		return fireball.NewJSONError(400, err)
+	}
+
+	output, err := r.ecr.DescribeImages(input)
+	if err != nil {
+		return fireball.NewJSONError(400, err)
+	}
+
+	detail := output.ImageDetails[0]
+	resp := models.Image{
+		Repository:    repo,
+		ImageTags:     []string{},
+		ImageDigest:   *detail.ImageDigest,
+		ImagePushedAt: *detail.ImagePushedAt,
+		ImageSize:     *detail.ImageSizeInBytes,
+	}
+
+	for _, tag := range detail.ImageTags {
+		resp.ImageTags = append(resp.ImageTags, *tag)
+	}
+
+	return fireball.NewJSONResponse(200, resp)
 }
 
 func (r *RepositoryController) DeleteImage(c *fireball.Context) (fireball.Response, error) {
@@ -253,6 +289,7 @@ func (r *RepositoryController) ListImages(c *fireball.Context) (fireball.Respons
 				}
 				image.ImageDigest = *detail.ImageDigest
 				image.ImagePushedAt = *detail.ImagePushedAt
+				image.ImageSize = *detail.ImageSizeInBytes
 				images = append(images, image)
 			}
 
