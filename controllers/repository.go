@@ -197,7 +197,36 @@ func (r *RepositoryController) GetImage(c *fireball.Context) (fireball.Response,
 }
 
 func (r *RepositoryController) DeleteImage(c *fireball.Context) (fireball.Response, error) {
-	return fireball.NewJSONResponse(401, "Not yet implemented")
+	owner := c.PathVariables["owner"]
+	name := c.PathVariables["name"]
+	repo := fmt.Sprintf("%s/%s", owner, name)
+	tag := c.PathVariables["tag"]
+
+	imageID := &ecr.ImageIdentifier{}
+	imageID.SetImageTag(tag)
+
+	imageIDs := []*ecr.ImageIdentifier{}
+	imageIDs = append(imageIDs, imageID)
+
+	input := &ecr.BatchDeleteImageInput{}
+	input.SetRepositoryName(repo)
+	input.SetImageIds(imageIDs)
+	if err := input.Validate(); err != nil {
+		return fireball.NewJSONError(400, err)
+	}
+
+	output, err := r.ecr.BatchDeleteImage(input)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(output.Failures) != 0 {
+		failure := output.Failures[0]
+		return fireball.NewJSONError(400, fmt.Errorf(failure.String()))
+	}
+
+	message := fmt.Sprintf("Image '%s:%s' successfully deleted.", repo, tag)
+	return fireball.NewJSONResponse(200, message)
 }
 
 func (r *RepositoryController) ListImages(c *fireball.Context) (fireball.Response, error) {
