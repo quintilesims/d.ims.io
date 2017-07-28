@@ -3,6 +3,7 @@ package controllers
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ecr"
@@ -119,6 +120,121 @@ func TestListRepositories(t *testing.T) {
 
 	c := generateContext(t, nil, nil)
 	if _, err := controller.ListRepositories(c); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestGetImage(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockECR := mock.NewMockECRAPI(ctrl)
+	controller := NewRepositoryController(mockECR)
+
+	validateDescribeImagesInput := func(input *ecr.DescribeImagesInput) {
+		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
+			t.Errorf("Name was '%v', expected '%v'", v, want)
+		}
+		if v, want := aws.StringValue(input.ImageIds[0].ImageTag), "test"; v != want {
+			t.Errorf("Tag was '%v', expected '%v'", v, want)
+		}
+	}
+
+	tag := ""
+
+	tags := []*string{}
+	tags = append(tags, &tag)
+
+	detail := &ecr.ImageDetail{}
+	detail.SetImageDigest("")
+	detail.SetImagePushedAt(time.Time{})
+	detail.SetImageSizeInBytes(0)
+	detail.SetImageTags(tags)
+	detail.SetRepositoryName("")
+
+	output := &ecr.DescribeImagesOutput{}
+	output.SetImageDetails([]*ecr.ImageDetail{detail})
+
+	mockECR.EXPECT().
+		DescribeImages(gomock.Any()).
+		Do(validateDescribeImagesInput).
+		Return(output, nil)
+
+	c := generateContext(t, nil, map[string]string{"tag": "test", "name": "test", "owner": "user"})
+	if _, err := controller.GetImage(c); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDeleteImage(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockECR := mock.NewMockECRAPI(ctrl)
+	controller := NewRepositoryController(mockECR)
+
+	validateBatchDeleteImageInput := func(input *ecr.BatchDeleteImageInput) {
+		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
+			t.Errorf("Name was '%v', expected '%v'", v, want)
+		}
+
+		if v, want := aws.StringValue(input.ImageIds[0].ImageTag), "test"; v != want {
+			t.Errorf("Tag was '%v', expected '%v'", v, want)
+		}
+	}
+
+	output := &ecr.BatchDeleteImageOutput{}
+
+	mockECR.EXPECT().
+		BatchDeleteImage(gomock.Any()).
+		Do(validateBatchDeleteImageInput).
+		Return(output, nil)
+
+	c := generateContext(t, nil, map[string]string{"tag": "test", "name": "test", "owner": "user"})
+	if _, err := controller.DeleteImage(c); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestListImages(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockECR := mock.NewMockECRAPI(ctrl)
+	controller := NewRepositoryController(mockECR)
+
+	numRepos := 3
+
+	populateRepos := func(input *ecr.DescribeRepositoriesInput, fn func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool) error {
+		repo := &ecr.Repository{}
+		repo.SetRepositoryName("test")
+
+		repos := []*ecr.Repository{}
+		repos = append(repos, repo)
+
+		output := &ecr.DescribeRepositoriesOutput{}
+		output.SetRepositories(repos)
+
+		for i := 0; i < numRepos; i++ {
+			fn(output, true)
+		}
+
+		return nil
+	}
+
+	mockECR.EXPECT().
+		DescribeRepositoriesPages(gomock.Any(), gomock.Any()).
+		Do(populateRepos).
+		Return(nil)
+
+	for i := 0; i < numRepos; i++ {
+		mockECR.EXPECT().
+			DescribeImagesPages(gomock.Any(), gomock.Any()).
+			Return(nil)
+	}
+
+	c := generateContext(t, nil, nil)
+	if _, err := controller.ListImages(c); err != nil {
 		t.Fatal(err)
 	}
 }
