@@ -8,14 +8,10 @@ import (
 	"github.com/zpatrick/go-plugin-swagger"
 )
 
-type SwaggerController struct {
-	host string
-}
+type SwaggerController struct{}
 
-func NewSwaggerController(host string) *SwaggerController {
-	return &SwaggerController{
-		host: host,
-	}
+func NewSwaggerController() *SwaggerController {
+	return &SwaggerController{}
 }
 
 func (s *SwaggerController) Routes() []*fireball.Route {
@@ -34,7 +30,7 @@ func (s *SwaggerController) Routes() []*fireball.Route {
 func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Response, error) {
 	spec := swagger.Spec{
 		SwaggerVersion: "2.0",
-		Host:           s.host,
+		Host:           c.Request.Host,
 		Schemes:        []string{"https"},
 		Info: &swagger.Info{
 			Title:   "D.IMS.IO",

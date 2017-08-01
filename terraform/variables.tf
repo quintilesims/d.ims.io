@@ -62,8 +62,3 @@ variable "auth0_connection" {
 variable "auth0_client_id" {
   description = "The client id associated with the Auth0 connection"
 }
-
-variable "swagger_host" {
-  description = "The host to send swagger requests"
-  default     = ""
-}
