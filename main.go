@@ -59,11 +59,6 @@ func main() {
 			EnvVar: config.ENVVAR_AWS_REGION,
 		},
 		cli.StringFlag{
-			Name:   "swagger-host",
-			Value:  config.DEFAULT_SWAGGER_HOST,
-			EnvVar: config.ENVVAR_SWAGGER_HOST,
-		},
-		cli.StringFlag{
 			Name:   "dynamo-table",
 			Value:  config.DEFAULT_DYNAMO_TABLE,
 			EnvVar: config.ENVVAR_DYNAMO_TABLE,
@@ -113,7 +108,7 @@ func main() {
 		repositoryController := controllers.NewRepositoryController(ecr)
 		tokenController := controllers.NewTokenController(tokenManager)
 		proxyController := controllers.NewProxyController(ecr, proxy)
-		swaggerController := controllers.NewSwaggerController(c.String("swagger-host"))
+		swaggerController := controllers.NewSwaggerController()
 
 		routes := rootController.Routes()
 		routes = append(routes, repositoryController.Routes()...)
