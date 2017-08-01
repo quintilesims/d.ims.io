@@ -28,10 +28,6 @@
                     "value": "${aws_region}"
                 },
                 {
-                    "name": "DIMSIO_SWAGGER_HOST",
-                    "value": "${swagger_host}"
-                },
-                {
                     "name": "DIMSIO_DYNAMO_TABLE",
                     "value": "${dynamo_table}"
                 },
