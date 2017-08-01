@@ -56,7 +56,6 @@ resource "layer0_service" "dimsio" {
   deploy        = "${layer0_deploy.dimsio.id}"
   load_balancer = "${layer0_load_balancer.dimsio.id}"
   scale         = "${var.scale}"
-  wait          = true
 }
 
 resource "layer0_deploy" "dimsio" {
