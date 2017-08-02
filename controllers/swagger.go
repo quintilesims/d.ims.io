@@ -155,10 +155,14 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 					},
 				},
 			},
-			"/images": map[string]swagger.Method{
+			"/repository/{owner}/{name}/image": map[string]swagger.Method{
 				"get": {
-					Tags:     []string{"Image"},
-					Summary:  "List all Images",
+					Tags:    []string{"Image"},
+					Summary: "List all images in a repository",
+					Parameters: []swagger.Parameter{
+						swagger.NewStringPathParam("owner", "Owner of the Repository", true),
+						swagger.NewStringPathParam("name", "Name of the Repository", true),
+					},
 					Security: swagger.BasicAuthSecurity("login"),
 					Responses: map[string]swagger.Response{
 						"200": {

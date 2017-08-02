@@ -1,13 +1,15 @@
 package models
 
 import (
+	"time"
+
 	"github.com/zpatrick/go-plugin-swagger"
 )
 
 type Repository struct {
-	Owner     string   `json:"owner"`
-	Name      string   `json:"name"`
-	ImageTags []string `json:"image_tags"`
+	Owner     string    `json:"owner"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func (r Repository) Definition() swagger.Definition {
@@ -16,7 +18,7 @@ func (r Repository) Definition() swagger.Definition {
 		Properties: map[string]swagger.Property{
 			"owner":      swagger.NewStringProperty(),
 			"name":       swagger.NewStringProperty(),
-			"image_tags": swagger.NewStringSliceProperty(),
+			"created_at": swagger.NewStringProperty(),
 		},
 	}
 }

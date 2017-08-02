@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
 	"github.com/quintilesims/d.ims.io/models"
 	"github.com/zpatrick/fireball"
+	bytesize "github.com/zpatrick/go-bytesize"
 )
 
 type RepositoryController struct {
@@ -45,16 +46,16 @@ func (r *RepositoryController) Routes() []*fireball.Route {
 			},
 		},
 		{
-			Path: "/repository/:owner/:name/image/:tag",
+			Path: "/repository/:owner/:name/image",
 			Handlers: fireball.Handlers{
-				"GET":    r.GetImage,
-				"DELETE": r.DeleteImage,
+				"GET": r.ListRepositoryImages,
 			},
 		},
 		{
-			Path: "/images",
+			Path: "/repository/:owner/:name/image/:tag",
 			Handlers: fireball.Handlers{
-				"GET": r.ListImages,
+				"GET":    r.GetRepositoryImage,
+				"DELETE": r.DeleteRepositoryImage,
 			},
 		},
 	}
@@ -116,39 +117,38 @@ func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Resp
 	name := c.PathVariables["name"]
 	repo := fmt.Sprintf("%s/%s", owner, name)
 
-	input := &ecr.DescribeImagesInput{}
-	input.SetRepositoryName(repo)
+	input := &ecr.DescribeRepositoriesInput{}
+	input.SetRepositoryNames([]*string{aws.String(repo)})
+
 	if err := input.Validate(); err != nil {
 		return fireball.NewJSONError(400, err)
 	}
 
-	tags := []string{}
-	fn := func(output *ecr.DescribeImagesOutput, lastPage bool) bool {
-		for _, image := range output.ImageDetails {
-			for _, tag := range image.ImageTags {
-				tags = append(tags, aws.StringValue(tag))
-			}
-		}
-
-		return !lastPage
-	}
-
-	if err := r.ecr.DescribeImagesPages(input, fn); err != nil {
+	output, err := r.ecr.DescribeRepositories(input)
+	if err != nil {
 		return nil, err
 	}
 
 	resp := models.Repository{
 		Owner:     owner,
 		Name:      name,
-		ImageTags: tags,
+		CreatedAt: aws.TimeValue(output.Repositories[0].CreatedAt),
 	}
 
 	return fireball.NewJSONResponse(200, resp)
 }
 
 func (r *RepositoryController) ListRepositories(c *fireball.Context) (fireball.Response, error) {
-	repositories, err := r.listRepositories()
-	if err != nil {
+	repositories := []string{}
+	fn := func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
+		for _, repository := range output.Repositories {
+			repositories = append(repositories, aws.StringValue(repository.RepositoryName))
+		}
+
+		return !lastPage
+	}
+
+	if err := r.ecr.DescribeRepositoriesPages(&ecr.DescribeRepositoriesInput{}, fn); err != nil {
 		return nil, err
 	}
 
@@ -161,11 +161,6 @@ func (r *RepositoryController) ListRepositories(c *fireball.Context) (fireball.R
 
 func (r *RepositoryController) ListOwnerRepositories(c *fireball.Context) (fireball.Response, error) {
 	owner := c.PathVariables["owner"]
-
-	input := &ecr.DescribeRepositoriesInput{}
-	if err := input.Validate(); err != nil {
-		return fireball.NewJSONError(400, err)
-	}
 
 	repositories := []string{}
 	fn := func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
@@ -181,7 +176,7 @@ func (r *RepositoryController) ListOwnerRepositories(c *fireball.Context) (fireb
 		return !lastPage
 	}
 
-	if err := r.ecr.DescribeRepositoriesPages(input, fn); err != nil {
+	if err := r.ecr.DescribeRepositoriesPages(&ecr.DescribeRepositoriesInput{}, fn); err != nil {
 		return nil, err
 	}
 
@@ -192,113 +187,33 @@ func (r *RepositoryController) ListOwnerRepositories(c *fireball.Context) (fireb
 	return fireball.NewJSONResponse(200, resp)
 }
 
-func (r *RepositoryController) GetImage(c *fireball.Context) (fireball.Response, error) {
+func (r *RepositoryController) ListRepositoryImages(c *fireball.Context) (fireball.Response, error) {
 	owner := c.PathVariables["owner"]
 	name := c.PathVariables["name"]
 	repo := fmt.Sprintf("%s/%s", owner, name)
-	tag := c.PathVariables["tag"]
 
-	imageID := &ecr.ImageIdentifier{}
-	imageID.SetImageTag(tag)
+	filter := &ecr.ListImagesFilter{}
+	filter.SetTagStatus("TAGGED")
 
-	imageIDs := []*ecr.ImageIdentifier{}
-	imageIDs = append(imageIDs, imageID)
-
-	input := &ecr.DescribeImagesInput{}
+	input := &ecr.ListImagesInput{}
 	input.SetRepositoryName(repo)
-	input.SetImageIds(imageIDs)
+	input.SetFilter(filter)
+
 	if err := input.Validate(); err != nil {
 		return fireball.NewJSONError(400, err)
 	}
 
-	output, err := r.ecr.DescribeImages(input)
-	if err != nil {
-		return fireball.NewJSONError(400, err)
+	images := []string{}
+	fn := func(output *ecr.ListImagesOutput, lastPage bool) bool {
+		for _, image := range output.ImageIds {
+			images = append(images, aws.StringValue(image.ImageTag))
+		}
+
+		return !lastPage
 	}
 
-	detail := output.ImageDetails[0]
-	resp := models.Image{
-		Repository:    repo,
-		ImageTags:     []string{},
-		ImageDigest:   *detail.ImageDigest,
-		ImagePushedAt: *detail.ImagePushedAt,
-		ImageSize:     *detail.ImageSizeInBytes,
-	}
-
-	for _, tag := range detail.ImageTags {
-		resp.ImageTags = append(resp.ImageTags, *tag)
-	}
-
-	return fireball.NewJSONResponse(200, resp)
-}
-
-func (r *RepositoryController) DeleteImage(c *fireball.Context) (fireball.Response, error) {
-	owner := c.PathVariables["owner"]
-	name := c.PathVariables["name"]
-	repo := fmt.Sprintf("%s/%s", owner, name)
-	tag := c.PathVariables["tag"]
-
-	imageID := &ecr.ImageIdentifier{}
-	imageID.SetImageTag(tag)
-
-	imageIDs := []*ecr.ImageIdentifier{}
-	imageIDs = append(imageIDs, imageID)
-
-	input := &ecr.BatchDeleteImageInput{}
-	input.SetRepositoryName(repo)
-	input.SetImageIds(imageIDs)
-	if err := input.Validate(); err != nil {
-		return fireball.NewJSONError(400, err)
-	}
-
-	output, err := r.ecr.BatchDeleteImage(input)
-	if err != nil {
+	if err := r.ecr.ListImagesPages(input, fn); err != nil {
 		return nil, err
-	}
-
-	if len(output.Failures) != 0 {
-		failure := output.Failures[0]
-		return fireball.NewJSONError(400, fmt.Errorf(failure.String()))
-	}
-
-	message := fmt.Sprintf("Image '%s:%s' successfully deleted.", repo, tag)
-	return fireball.NewJSONResponse(200, message)
-}
-
-func (r *RepositoryController) ListImages(c *fireball.Context) (fireball.Response, error) {
-	repositories, err := r.listRepositories()
-	if err != nil {
-		return nil, err
-	}
-
-	images := []models.Image{}
-	for _, repository := range repositories {
-		input := &ecr.DescribeImagesInput{}
-		input.SetRepositoryName(repository)
-		if err := input.Validate(); err != nil {
-			return fireball.NewJSONError(400, err)
-		}
-
-		fn := func(output *ecr.DescribeImagesOutput, lastPage bool) bool {
-			for _, detail := range output.ImageDetails {
-				image := models.Image{}
-				image.Repository = repository
-				image.ImageTags = []string{}
-				for _, tag := range detail.ImageTags {
-					image.ImageTags = append(image.ImageTags, *tag)
-				}
-				image.ImageDigest = *detail.ImageDigest
-				image.ImagePushedAt = *detail.ImagePushedAt
-				image.ImageSize = *detail.ImageSizeInBytes
-				images = append(images, image)
-			}
-
-			return !lastPage
-		}
-
-		if err := r.ecr.DescribeImagesPages(input, fn); err != nil {
-			return nil, err
-		}
 	}
 
 	resp := models.ListImagesResponse{
@@ -308,24 +223,66 @@ func (r *RepositoryController) ListImages(c *fireball.Context) (fireball.Respons
 	return fireball.NewJSONResponse(200, resp)
 }
 
-func (r *RepositoryController) listRepositories() ([]string, error) {
-	input := &ecr.DescribeRepositoriesInput{}
+func (r *RepositoryController) GetRepositoryImage(c *fireball.Context) (fireball.Response, error) {
+	owner := c.PathVariables["owner"]
+	name := c.PathVariables["name"]
+	tag := c.PathVariables["tag"]
+	repo := fmt.Sprintf("%s/%s", owner, name)
+
+	imageID := &ecr.ImageIdentifier{}
+	imageID.SetImageTag(tag)
+
+	input := &ecr.DescribeImagesInput{}
+	input.SetRepositoryName(repo)
+	input.SetImageIds([]*ecr.ImageIdentifier{imageID})
+
 	if err := input.Validate(); err != nil {
+		return fireball.NewJSONError(400, err)
+	}
+
+	output, err := r.ecr.DescribeImages(input)
+	if err != nil {
 		return nil, err
 	}
 
-	repositories := []string{}
-	fn := func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
-		for _, repository := range output.Repositories {
-			repositories = append(repositories, aws.StringValue(repository.RepositoryName))
-		}
+	detail := output.ImageDetails[0]
+	size := bytesize.Bytesize(aws.Int64Value(detail.ImageSizeInBytes))
 
-		return !lastPage
+	resp := models.Image{
+		Digest:   aws.StringValue(detail.ImageDigest),
+		Size:     size.Format("MB"),
+		PushedAt: aws.TimeValue(detail.ImagePushedAt),
 	}
 
-	if err := r.ecr.DescribeRepositoriesPages(input, fn); err != nil {
+	return fireball.NewJSONResponse(200, resp)
+}
+
+func (r *RepositoryController) DeleteRepositoryImage(c *fireball.Context) (fireball.Response, error) {
+	owner := c.PathVariables["owner"]
+	name := c.PathVariables["name"]
+	tag := c.PathVariables["tag"]
+	repo := fmt.Sprintf("%s/%s", owner, name)
+
+	imageID := &ecr.ImageIdentifier{}
+	imageID.SetImageTag(tag)
+
+	input := &ecr.BatchDeleteImageInput{}
+	input.SetRepositoryName(repo)
+	input.SetImageIds([]*ecr.ImageIdentifier{imageID})
+
+	if err := input.Validate(); err != nil {
+		return fireball.NewJSONError(400, err)
+	}
+
+	output, err := r.ecr.BatchDeleteImage(input)
+	if err != nil {
 		return nil, err
 	}
 
-	return repositories, nil
+	if failures := output.Failures; len(failures) > 0 {
+		return nil, fmt.Errorf(failures[0].String())
+	}
+
+	message := fmt.Sprintf("Image '%s:%s' successfully deleted.", repo, tag)
+	return fireball.NewJSONResponse(200, message)
 }
