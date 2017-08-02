@@ -5,14 +5,14 @@ import (
 )
 
 type ListImagesResponse struct {
-	Images []Image `json:"images"`
+	Images []string `json:"images"`
 }
 
 func (r ListImagesResponse) Definition() swagger.Definition {
 	return swagger.Definition{
 		Type: "object",
 		Properties: map[string]swagger.Property{
-			"images": swagger.NewObjectSliceProperty("Image"),
+			"images": swagger.NewStringSliceProperty(),
 		},
 	}
 }
