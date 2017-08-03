@@ -96,7 +96,7 @@ func (a *Auth0Manager) authenticate(username, password string) (bool, error) {
 		Scope:      "openid",
 	}
 
-	for backoff := time.Duration(0); true; backoff += time.Millisecond * 500 {
+	for backoff := time.Duration(0); true; backoff += (time.Millisecond * 500) {
 		time.Sleep(backoff * time.Duration(timeMultiplier))
 		<-a.throttle
 
@@ -117,7 +117,7 @@ func (a *Auth0Manager) authenticate(username, password string) (bool, error) {
 			return false, err
 		}
 
-		log.Printf("User '%s' sent valid Auth0 credentials.", username)
+		log.Printf("[DEBUG] User '%s' sent valid Auth0 credentials.", username)
 		break
 	}
 
