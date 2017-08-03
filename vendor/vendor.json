@@ -241,6 +241,12 @@
 			"revisionTime": "2017-06-26T21:20:07Z"
 		},
 		{
+			"checksumSHA1": "SZaMeoqPH0b36UUwpmgnW7VqDB0=",
+			"path": "github.com/zpatrick/go-bytesize",
+			"revision": "40b68ac70b6ad801369c8de9df588ffa5b9b4275",
+			"revisionTime": "2017-02-14T18:21:26Z"
+		},
+		{
 			"checksumSHA1": "QeZ2xsLZBpItk0uZtsh1T7NofPg=",
 			"path": "github.com/zpatrick/go-cache",
 			"revision": "07dbf58cb418d923cced58e7201d742c6adb969d",
