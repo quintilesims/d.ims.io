@@ -110,3 +110,25 @@ func TestAuth0ManagerAuthenticate_NotValidCredsAreChecked(t *testing.T) {
 
 	assert.Equal(t, count, 2)
 }
+
+func TestAuth0ManagerAuthenticate_RetriesOn429(t *testing.T) {
+	count := 0
+
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		if count < 2 {
+			MarshalAndWrite(t, w, nil, 429)
+		} else {
+			MarshalAndWrite(t, w, nil, 200)
+		}
+
+		count++
+	}
+
+	auth0Manager, server := newAuth0ManagerAndServer(handler)
+	defer server.Close()
+
+	_, err := auth0Manager.Authenticate("", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
