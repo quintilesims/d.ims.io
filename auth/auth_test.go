@@ -14,7 +14,7 @@ type Handler func(w http.ResponseWriter, r *http.Request)
 
 func newAuth0ManagerAndServer(handler Handler) (*Auth0Manager, *httptest.Server) {
 	server := httptest.NewServer(http.HandlerFunc(handler))
-	auth0Manager := NewAuth0Manager(server.URL, "", "", 500*time.Millisecond)
+	auth0Manager := NewAuth0Manager(server.URL, "", "", time.Second/2)
 
 	return auth0Manager, server
 }

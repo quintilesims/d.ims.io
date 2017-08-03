@@ -101,7 +101,7 @@ func main() {
 		auth0Manager := auth.NewAuth0Manager(c.String("auth0-domain"),
 			c.String("auth0-client-id"),
 			c.String("auth0-connection"),
-			time.Millisecond*500)
+			time.Second/2)
 
 		authenticator := auth.NewCompositeAuthenticator(tokenManager, auth0Manager)
 		proxy := proxy.NewECRProxy(c.String("registry-endpoint"))
