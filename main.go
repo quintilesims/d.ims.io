@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/defaults"
@@ -100,7 +101,7 @@ func main() {
 		auth0Manager := auth.NewAuth0Manager(c.String("auth0-domain"),
 			c.String("auth0-client-id"),
 			c.String("auth0-connection"),
-			500)
+			time.Millisecond*500)
 
 		authenticator := auth.NewCompositeAuthenticator(tokenManager, auth0Manager)
 		proxy := proxy.NewECRProxy(c.String("registry-endpoint"))
