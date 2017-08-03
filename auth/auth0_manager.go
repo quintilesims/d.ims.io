@@ -12,14 +12,11 @@ import (
 var timeMultiplier = 1
 
 type Auth0Manager struct {
-	clientID           string
-	connection         string
-	client             *rclient.RestClient
-	cache              *cache.Cache
-	throttle           <-chan time.Time
-	throttleMin        int
-	throttleMultiplier int
-	lastThrottled      time.Time
+	clientID   string
+	connection string
+	client     *rclient.RestClient
+	cache      *cache.Cache
+	throttle   <-chan time.Time
 }
 
 type oauthReq struct {
@@ -41,32 +38,17 @@ const (
 	validAuthExpiry = 1 * time.Hour
 )
 
-func NewAuth0Manager(domain, clientID, connection string, throttleMin int) *Auth0Manager {
+func NewAuth0Manager(domain, clientID, connection string, rateLimit time.Duration) *Auth0Manager {
 	return &Auth0Manager{
-		clientID:           clientID,
-		connection:         connection,
-		client:             rclient.NewRestClient(domain),
-		cache:              cache.New(),
-		throttle:           time.Tick(time.Millisecond * time.Duration(throttleMin)),
-		throttleMin:        throttleMin,
-		throttleMultiplier: throttleMin,
-		lastThrottled:      time.Now(),
+		clientID:   clientID,
+		connection: connection,
+		client:     rclient.NewRestClient(domain),
+		cache:      cache.New(),
+		throttle:   time.Tick(rateLimit),
 	}
 }
 
 func (a *Auth0Manager) Authenticate(username, password string) (bool, error) {
-	if a.throttleMultiplier > a.throttleMin && time.Since(a.lastThrottled) > 1*time.Minute {
-		a.throttleMultiplier = a.throttleMultiplier / 2
-		if a.throttleMultiplier < a.throttleMin {
-			a.throttleMultiplier = a.throttleMin
-		}
-
-		log.Printf("[INFO] 1 min since last throttle update, decreasing throttle to %v", time.Millisecond*time.Duration(a.throttleMultiplier))
-
-		a.throttle = time.Tick(time.Millisecond / time.Duration(a.throttleMultiplier))
-		a.lastThrottled = time.Now()
-	}
-
 	key := fmt.Sprintf("%s:%s", username, password)
 	var cachedStatus *authStatus
 	if result, exists := a.cache.Getf(key); exists {
@@ -79,12 +61,32 @@ func (a *Auth0Manager) Authenticate(username, password string) (bool, error) {
 		return true, nil
 	}
 
-	// throttle to deal with rate limiting
-	<-a.throttle
-
 	// will only sleep if cachedStatus already exists with a penalty
 	time.Sleep(cachedStatus.penalty * time.Duration(timeMultiplier))
 
+	isAuthenticated, err := a.authenticate(username, password)
+	if err != nil {
+		return false, err
+	}
+
+	if !isAuthenticated {
+		cachedStatus.penalty += time.Second
+		if cachedStatus.penalty > maxPenalty {
+			cachedStatus.penalty = maxPenalty
+		}
+
+		a.cache.Add(key, cachedStatus)
+		return false, nil
+	}
+
+	cachedStatus.isValid = true
+	cachedStatus.penalty = 0 * time.Second
+	a.cache.Addf(key, cachedStatus, validAuthExpiry)
+
+	return true, nil
+}
+
+func (a *Auth0Manager) authenticate(username, password string) (bool, error) {
 	req := oauthReq{
 		ClientID:   a.clientID,
 		Connection: a.connection,
@@ -94,35 +96,30 @@ func (a *Auth0Manager) Authenticate(username, password string) (bool, error) {
 		Scope:      "openid",
 	}
 
-	if err := a.client.Post("/oauth/ro", req, nil); err != nil {
-		if err, ok := err.(*rclient.ResponseError); ok && (err.Response.StatusCode == 401 || err.Response.StatusCode == 429) {
-			cachedStatus.penalty += time.Second
-			if cachedStatus.penalty > maxPenalty {
-				cachedStatus.penalty = maxPenalty
-			}
+	for backoff := time.Duration(0); true; backoff += time.Millisecond * 500 {
+		time.Sleep(backoff * time.Duration(timeMultiplier))
+		<-a.throttle
 
-			if err.Response.StatusCode == 429 {
-				if a.throttleMultiplier > 0 {
-					a.throttleMultiplier = a.throttleMultiplier * 2
-				} else {
-					a.throttleMultiplier = 1
+		if err := a.client.Post("/oauth/ro", req, nil); err != nil {
+			if err, ok := err.(*rclient.ResponseError); ok {
+				switch err.Response.StatusCode {
+				case 401:
+					log.Printf("[DEBUG] User '%s' sent invalid Auth0 credentials.", username)
+					return false, nil
+				case 429:
+					log.Printf("[DEBUG] Auth0 returned 429 response for user '%s'; retrying.", username)
+					continue
+				default:
+					return false, err
 				}
-
-				log.Printf("[INFO] Too many requests, increasing throttle to %v", time.Millisecond*time.Duration(a.throttleMultiplier))
-
-				a.throttle = time.Tick(time.Millisecond * time.Duration(a.throttleMultiplier))
-				a.lastThrottled = time.Now()
 			}
 
-			a.cache.Add(key, cachedStatus)
-			return false, nil
+			return false, err
 		}
 
-		return false, err
+		log.Printf("User '%s' sent valid Auth0 credentials.", username)
+		break
 	}
 
-	cachedStatus.isValid = true
-	cachedStatus.penalty = 0 * time.Second
-	a.cache.Addf(key, cachedStatus, validAuthExpiry)
 	return true, nil
 }
