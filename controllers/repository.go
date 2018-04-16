@@ -6,20 +6,24 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
+	"github.com/quintilesims/d.ims.io/auth"
 	"github.com/quintilesims/d.ims.io/models"
 	"github.com/zpatrick/fireball"
 	bytesize "github.com/zpatrick/go-bytesize"
 )
 
 type RepositoryController struct {
-	ecr ecriface.ECRAPI
+	ecr    ecriface.ECRAPI
+	access auth.AccessManager
 }
 
-func NewRepositoryController(e ecriface.ECRAPI) *RepositoryController {
+func NewRepositoryController(e ecriface.ECRAPI, a auth.AccessManager) *RepositoryController {
 	return &RepositoryController{
-		ecr: e,
+		ecr:    e,
+		access: a,
 	}
 }
 
@@ -84,12 +88,61 @@ func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.R
 		return nil, err
 	}
 
+	if err := r.addRepositoryPolicy(repo); err != nil {
+		return nil, err
+	}
+
 	resp := models.CreateRepositoryResponse{
 		Owner: owner,
 		Name:  req.Name,
 	}
 
 	return fireball.NewJSONResponse(202, resp)
+}
+
+func (r *RepositoryController) addRepositoryPolicy(repo string) error {
+	policyDoc := models.NewPolicyDocument()
+
+	getPolicyInput := &ecr.GetRepositoryPolicyInput{}
+	getPolicyInput.SetRepositoryName(repo)
+	getPolicyOutput, err := r.ecr.GetRepositoryPolicy(getPolicyInput)
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			if aerr.Code() != ecr.ErrCodeRepositoryPolicyNotFoundException {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+
+	if getPolicyOutput != nil && aws.StringValue(getPolicyOutput.PolicyText) != "" {
+		if err := json.Unmarshal([]byte(aws.StringValue(getPolicyOutput.PolicyText)), policyDoc); err != nil {
+			return err
+		}
+	}
+
+	accounts, err := r.access.Accounts()
+	if err != nil {
+		return err
+	}
+
+	for _, accountID := range accounts {
+		policyDoc.AddAWSAccountPrincipal(accountID)
+	}
+
+	policyInput := &ecr.SetRepositoryPolicyInput{}
+	policyInput.SetPolicyText(policyDoc.RenderPolicyText())
+	policyInput.SetRepositoryName(repo)
+	if err := policyInput.Validate(); err != nil {
+		return fireball.NewError(400, err, nil)
+	}
+
+	if _, err := r.ecr.SetRepositoryPolicy(policyInput); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *RepositoryController) DeleteRepository(c *fireball.Context) (fireball.Response, error) {
