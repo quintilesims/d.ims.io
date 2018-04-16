@@ -87,6 +87,7 @@ func (a *Auth0Manager) Authenticate(username, password string) (bool, error) {
 }
 
 func (a *Auth0Manager) authenticate(username, password string) (bool, error) {
+	log.Printf("[DEBUG] Attempting to authenticate user %s through Auth0", username)
 	req := oauthReq{
 		ClientID:   a.clientID,
 		Connection: a.connection,
