@@ -10,6 +10,10 @@ variable "dynamodb_write_capacity" {
   default = 1
 }
 
+variable "s3_bucket_name" {
+  default = "d.ims.io-backups"
+}
+
 variable "iam_user_name" {
   default = "d.ims.io"
 }
