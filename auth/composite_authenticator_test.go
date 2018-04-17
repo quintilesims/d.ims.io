@@ -10,6 +10,13 @@ func newTestAuthenticator(isValid bool, err error) AuthenticatorFunc {
 	})
 }
 
+func TestEmptyUserPass(t *testing.T) {
+	target := NewCompositeAuthenticator()
+	if _, err := target.Authenticate("", ""); err == nil {
+		t.Fatalf("Error expected when authenticating with no user and pass")
+	}
+}
+
 func TestCompositeAuthenticator(t *testing.T) {
 	cases := []struct {
 		Name           string
