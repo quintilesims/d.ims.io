@@ -1,11 +1,12 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_dynamodb_table" "dimsio" {
-  name           = "${var.dynamodb_table_name}"
-  read_capacity  = "${var.dynamodb_read_capacity}"
-  write_capacity = "${var.dynamodb_write_capacity}"
-  stream_enabled = true
-  hash_key       = "Token"
+  name             = "${var.dynamodb_table_name}"
+  read_capacity    = "${var.dynamodb_read_capacity}"
+  write_capacity   = "${var.dynamodb_write_capacity}"
+  stream_enabled   = true
+  stream_view_type = "NEW_IMAGE"
+  hash_key         = "Token"
 
   attribute {
     name = "Token"
@@ -86,4 +87,5 @@ module "backup" {
   dynamodb_table_arn        = "${aws_dynamodb_table.dimsio.arn}"
   dynamodb_table_stream_arn = "${aws_dynamodb_table.dimsio.stream_arn}"
   backup_s3_bucket_name     = "${var.s3_bucket_name}"
+  lambda_function_name      = "${var.lambda_function_name}"
 }
