@@ -42,7 +42,7 @@ func (d *DynamoAccessManager) GrantAccess(accountID string) error {
 
 func (d *DynamoAccessManager) RevokeAccess(accountID string) error {
 	key := map[string]*dynamodb.AttributeValue{
-		"Token": {
+		"AccountID": {
 			S: &accountID,
 		},
 	}

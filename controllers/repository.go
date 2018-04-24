@@ -105,6 +105,10 @@ func (r *RepositoryController) addRepositoryPolicy(repo string) error {
 
 	getPolicyInput := &ecr.GetRepositoryPolicyInput{}
 	getPolicyInput.SetRepositoryName(repo)
+	if err := getPolicyInput.Validate(); err != nil {
+		return err
+	}
+
 	getPolicyOutput, err := r.ecr.GetRepositoryPolicy(getPolicyInput)
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
@@ -125,6 +129,10 @@ func (r *RepositoryController) addRepositoryPolicy(repo string) error {
 	accounts, err := r.access.Accounts()
 	if err != nil {
 		return err
+	}
+
+	if len(accounts) == 0 {
+		return nil
 	}
 
 	for _, accountID := range accounts {

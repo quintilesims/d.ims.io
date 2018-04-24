@@ -3,10 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "H+TRgglC25ej2SEYMxvfUD8r1ZU=",
+			"checksumSHA1": "9ILoAXVhU50xB2PZuN/MTjL/TIs=",
 			"path": "github.com/aws/aws-sdk-go/aws",
-			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
-			"revisionTime": "2017-05-16T20:59:04Z"
+			"revision": "76c13be2e559a4239edab10ed148554b52b39553",
+			"revisionTime": "2018-04-23T19:37:20Z"
 		},
 		{
 			"checksumSHA1": "Y9W+4GimK4Fuxq+vyIskVYFRnX4=",
@@ -99,6 +99,12 @@
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
 		{
+			"checksumSHA1": "wjxQlU1PYxrDRFoL1Vek8Wch7jk=",
+			"path": "github.com/aws/aws-sdk-go/internal/sdkio",
+			"revision": "76c13be2e559a4239edab10ed148554b52b39553",
+			"revisionTime": "2018-04-23T19:37:20Z"
+		},
+		{
 			"checksumSHA1": "wk7EyvDaHwb5qqoOP/4d3cV0708=",
 			"path": "github.com/aws/aws-sdk-go/private/protocol",
 			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
@@ -153,16 +159,20 @@
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
 		{
-			"checksumSHA1": "Lwqoi9aWc+j6dzkgt06LLR7i1XA=",
+			"checksumSHA1": "V3D5pDdtXS0yVShpS/fOqFGxCrA=",
 			"path": "github.com/aws/aws-sdk-go/service/ecr",
-			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
-			"revisionTime": "2017-05-16T20:59:04Z"
+			"revision": "76c13be2e559a4239edab10ed148554b52b39553",
+			"revisionTime": "2018-04-23T19:37:20Z"
 		},
 		{
 			"checksumSHA1": "cBlx0Bt7+zRvBPWrJblgYtIk/Bk=",
 			"path": "github.com/aws/aws-sdk-go/service/ecr/ecriface",
 			"revision": "00cd9d8682fc2ac26e338236d081eb0927ebf722",
 			"revisionTime": "2017-05-16T20:59:04Z"
+		},
+		{
+			"path": "github.com/aws/aws-sdk-go/service/ecriface",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "fbROB+q5aRgvH79KOnEqr63ahRE=",
@@ -185,10 +195,10 @@
 			"revisionTime": "2017-05-16T20:59:04Z"
 		},
 		{
-			"checksumSHA1": "I2lXmuk1IHZmw+zDXgTGi0+LvpY=",
+			"checksumSHA1": "kpDdn8FTTpe3DOSH7qDyfvIIzrY=",
 			"path": "github.com/golang/mock/gomock",
-			"revision": "15f8b22550555c0d3edf5afa97d74001bda2208b",
-			"revisionTime": "2015-06-12T17:25:59Z"
+			"revision": "8b2eeeb0ca5f56c78bec5efde9c4a21d9201126c",
+			"revisionTime": "2018-04-06T15:19:24Z"
 		},
 		{
 			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
@@ -263,6 +273,12 @@
 			"path": "github.com/zpatrick/rclient",
 			"revision": "8e281dcd539b2c8c180e999c6f97f472d8cbee32",
 			"revisionTime": "2017-06-22T21:53:04Z"
+		},
+		{
+			"checksumSHA1": "GtamqiJoL7PGHsN454AoffBFMa8=",
+			"path": "golang.org/x/net/context",
+			"revision": "5f9ae10d9af5b1c89ae6904293b14b064d4ada23",
+			"revisionTime": "2018-04-20T07:04:21Z"
 		}
 	],
 	"rootPath": "github.com/quintilesims/d.ims.io"
