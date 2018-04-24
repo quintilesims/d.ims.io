@@ -88,7 +88,12 @@ func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.R
 		return nil, err
 	}
 
-	if err := r.addRepositoryPolicy(repo); err != nil {
+	accounts, err := r.access.Accounts()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := addToRepositoryPolicy(r.ecr, repo, accounts); err != nil {
 		return nil, err
 	}
 
@@ -200,16 +205,8 @@ func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Resp
 }
 
 func (r *RepositoryController) ListRepositories(c *fireball.Context) (fireball.Response, error) {
-	repositories := []string{}
-	fn := func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
-		for _, repository := range output.Repositories {
-			repositories = append(repositories, aws.StringValue(repository.RepositoryName))
-		}
-
-		return !lastPage
-	}
-
-	if err := r.ecr.DescribeRepositoriesPages(&ecr.DescribeRepositoriesInput{}, fn); err != nil {
+	repositories, err := listRepositories(r.ecr)
+	if err != nil {
 		return nil, err
 	}
 

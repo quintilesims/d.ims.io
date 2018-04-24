@@ -59,6 +59,22 @@ func (a *AccessController) GrantAccess(c *fireball.Context) (fireball.Response, 
 		return nil, err
 	}
 
+	repositories, err := listRepositories(a.ecr)
+	if err != nil {
+		return nil, err
+	}
+
+	accounts, err := a.access.Accounts()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, r := range repositories {
+		if err := addToRepositoryPolicy(a.ecr, r, append(accounts, request.Account)); err != nil {
+			return fireball.NewJSONError(500, err)
+		}
+	}
+
 	if err := a.access.GrantAccess(request.Account); err != nil {
 		return fireball.NewJSONError(500, err)
 	}
@@ -67,8 +83,20 @@ func (a *AccessController) GrantAccess(c *fireball.Context) (fireball.Response, 
 }
 
 func (a *AccessController) RevokeAccess(c *fireball.Context) (fireball.Response, error) {
-	if err := a.access.RevokeAccess(c.PathVariables["id"]); err != nil {
+	accountID := c.PathVariables["id"]
+	repositories, err := listRepositories(a.ecr)
+	if err != nil {
 		return nil, err
+	}
+
+	for _, r := range repositories {
+		if err := removeFromRepositoryPolicy(a.ecr, r, accountID); err != nil {
+			return fireball.NewJSONError(500, err)
+		}
+	}
+
+	if err := a.access.RevokeAccess(accountID); err != nil {
+		return fireball.NewJSONError(500, err)
 	}
 
 	return fireball.NewJSONResponse(200, nil)

@@ -55,6 +55,17 @@ func (p *PolicyDocument) AddAWSAccountPrincipal(accountID string) {
 	p.Statement = append(p.Statement, newStatement(accountID))
 }
 
+func (p *PolicyDocument) RemoveAWSAccountPrincipal(accountID string) {
+	temp := []statement{}
+	for _, s := range p.Statement {
+		if s.Sid != accountID {
+			temp = append(temp, s)
+		}
+	}
+
+	p.Statement = temp
+}
+
 func (p *PolicyDocument) RenderPolicyText() string {
 	d, err := json.Marshal(p)
 	if err != nil {

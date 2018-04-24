@@ -15,6 +15,14 @@ func TestGrantAccess(t *testing.T) {
 	mockAccessManager := mock.NewMockAccessManager(ctrl)
 	controller := NewAccessController(mockECR, mockAccessManager)
 
+	mockECR.EXPECT().
+		DescribeRepositoriesPages(gomock.Any(), gomock.Any()).
+		Return(nil)
+
+	mockAccessManager.EXPECT().
+		Accounts().
+		Return([]string{}, nil)
+
 	mockAccessManager.EXPECT().
 		GrantAccess(gomock.Any()).
 		Return(nil)
@@ -32,6 +40,10 @@ func TestRevokeAccess(t *testing.T) {
 	mockECR := mock.NewMockECRAPI(ctrl)
 	mockAccessManager := mock.NewMockAccessManager(ctrl)
 	controller := NewAccessController(mockECR, mockAccessManager)
+
+	mockECR.EXPECT().
+		DescribeRepositoriesPages(gomock.Any(), gomock.Any()).
+		Return(nil)
 
 	mockAccessManager.EXPECT().
 		RevokeAccess(gomock.Any()).
