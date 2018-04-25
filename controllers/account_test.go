@@ -10,6 +10,20 @@ import (
 	"github.com/quintilesims/d.ims.io/models"
 )
 
+func TestGrantAccessInputValidation(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockECR := mock.NewMockECRAPI(ctrl)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewAccountController(mockECR, mockAccountManager)
+
+	c := generateContext(t, models.GrantAccessRequest{Account: ""}, nil)
+	if _, err := controller.GrantAccess(c); err == nil {
+		t.Fatal("expected error when GrantAccessRequest.Account is empty")
+	}
+}
+
 func TestGrantAccess(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -56,6 +70,20 @@ func TestGrantAccess(t *testing.T) {
 	c := generateContext(t, models.GrantAccessRequest{Account: "account-id"}, nil)
 	if _, err := controller.GrantAccess(c); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestRevokeAccessInputValidation(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockECR := mock.NewMockECRAPI(ctrl)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewAccountController(mockECR, mockAccountManager)
+
+	c := generateContext(t, nil, nil)
+	if _, err := controller.RevokeAccess(c); err == nil {
+		t.Fatal("expected error when id account id is not specified")
 	}
 }
 
