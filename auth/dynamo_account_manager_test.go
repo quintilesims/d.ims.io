@@ -27,7 +27,7 @@ func TestDynamoGrantAccess(t *testing.T) {
 		}
 
 		if input.Item["AccountID"].S == nil {
-			t.Error("Column 'Token' was nil")
+			t.Error("Column 'AccountID' was nil")
 		}
 	}
 

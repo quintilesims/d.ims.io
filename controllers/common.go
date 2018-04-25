@@ -89,7 +89,7 @@ func removeFromRepositoryPolicy(e ecriface.ECRAPI, repositoryName string, accoun
 		return nil
 	}
 
-	return nil
+	return setRepositoryPolicy(e, repositoryName, policyDoc.RenderPolicyText())
 }
 
 func addToRepositoryPolicy(e ecriface.ECRAPI, repositoryName string, accounts []string) error {

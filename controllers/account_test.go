@@ -3,8 +3,11 @@ package controllers
 import (
 	"testing"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/golang/mock/gomock"
 	"github.com/quintilesims/d.ims.io/mock"
+	"github.com/quintilesims/d.ims.io/models"
 )
 
 func TestGrantAccess(t *testing.T) {
@@ -15,19 +18,42 @@ func TestGrantAccess(t *testing.T) {
 	mockAccountManager := mock.NewMockAccountManager(ctrl)
 	controller := NewAccountController(mockECR, mockAccountManager)
 
+	fnListRepos := func(input *ecr.DescribeRepositoriesInput, fn func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool) error {
+		output := &ecr.DescribeRepositoriesOutput{
+			Repositories: []*ecr.Repository{
+				{RepositoryName: aws.String("user/name-1")},
+				{RepositoryName: aws.String("user/name-2")},
+			},
+		}
+
+		fn(output, false)
+		return nil
+	}
+
 	mockECR.EXPECT().
 		DescribeRepositoriesPages(gomock.Any(), gomock.Any()).
+		Do(fnListRepos).
 		Return(nil)
 
 	mockAccountManager.EXPECT().
 		Accounts().
-		Return([]string{}, nil)
+		Return([]string{"account-id"}, nil)
+
+	mockECR.EXPECT().
+		GetRepositoryPolicy(gomock.Any()).
+		Return(&ecr.GetRepositoryPolicyOutput{}, nil).
+		Times(2)
+
+	mockECR.EXPECT().
+		SetRepositoryPolicy(gomock.Any()).
+		Return(&ecr.SetRepositoryPolicyOutput{}, nil).
+		Times(2)
 
 	mockAccountManager.EXPECT().
 		GrantAccess(gomock.Any()).
 		Return(nil)
 
-	c := generateContext(t, nil, nil)
+	c := generateContext(t, models.GrantAccessRequest{Account: "account-id"}, nil)
 	if _, err := controller.GrantAccess(c); err != nil {
 		t.Fatal(err)
 	}
@@ -41,15 +67,41 @@ func TestRevokeAccess(t *testing.T) {
 	mockAccountManager := mock.NewMockAccountManager(ctrl)
 	controller := NewAccountController(mockECR, mockAccountManager)
 
+	fnListRepos := func(input *ecr.DescribeRepositoriesInput, fn func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool) error {
+		output := &ecr.DescribeRepositoriesOutput{
+			Repositories: []*ecr.Repository{
+				{RepositoryName: aws.String("user/name-1")},
+			},
+		}
+
+		fn(output, false)
+		return nil
+	}
+
 	mockECR.EXPECT().
 		DescribeRepositoriesPages(gomock.Any(), gomock.Any()).
+		Do(fnListRepos).
 		Return(nil)
+
+	policyDoc := &models.PolicyDocument{}
+	policyDoc.AddAWSAccountPrincipal("account-id")
+
+	getPolicyOutput := &ecr.GetRepositoryPolicyOutput{}
+	getPolicyOutput.SetPolicyText(policyDoc.RenderPolicyText())
+
+	mockECR.EXPECT().
+		GetRepositoryPolicy(gomock.Any()).
+		Return(getPolicyOutput, nil)
+
+	mockECR.EXPECT().
+		SetRepositoryPolicy(gomock.Any()).
+		Return(&ecr.SetRepositoryPolicyOutput{}, nil)
 
 	mockAccountManager.EXPECT().
 		RevokeAccess(gomock.Any()).
 		Return(nil)
 
-	c := generateContext(t, nil, nil)
+	c := generateContext(t, nil, map[string]string{"id": "account-id"})
 	if _, err := controller.RevokeAccess(c); err != nil {
 		t.Fatal(err)
 	}

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
 	"github.com/quintilesims/d.ims.io/auth"
@@ -42,7 +43,7 @@ func (a *AccountController) Routes() []*fireball.Route {
 func (a *AccountController) ListAccounts(c *fireball.Context) (fireball.Response, error) {
 	response, err := a.access.Accounts()
 	if err != nil {
-		return fireball.NewJSONError(500, err)
+		return nil, err
 	}
 
 	return fireball.NewJSONResponse(200, models.ListAccountsResponse{Accounts: response})
@@ -54,24 +55,29 @@ func (a *AccountController) GrantAccess(c *fireball.Context) (fireball.Response,
 		return fireball.NewJSONError(400, err)
 	}
 
+	if err := request.Validate(); err != nil {
+		return fireball.NewJSONError(400, err)
+	}
+
 	repositories, err := listRepositories(a.ecr)
 	if err != nil {
-		return fireball.NewJSONError(500, err)
+		return nil, err
 	}
 
 	accounts, err := a.access.Accounts()
 	if err != nil {
-		return fireball.NewJSONError(500, err)
+		return nil, err
 	}
 
+	accounts = append(accounts, request.Account)
 	for _, r := range repositories {
-		if err := addToRepositoryPolicy(a.ecr, r, append(accounts, request.Account)); err != nil {
-			return fireball.NewJSONError(500, err)
+		if err := addToRepositoryPolicy(a.ecr, r, accounts); err != nil {
+			return nil, err
 		}
 	}
 
 	if err := a.access.GrantAccess(request.Account); err != nil {
-		return fireball.NewJSONError(500, err)
+		return nil, err
 	}
 
 	return fireball.NewJSONResponse(204, nil)
@@ -79,19 +85,23 @@ func (a *AccountController) GrantAccess(c *fireball.Context) (fireball.Response,
 
 func (a *AccountController) RevokeAccess(c *fireball.Context) (fireball.Response, error) {
 	accountID := c.PathVariables["id"]
+	if accountID == "" {
+		return fireball.NewJSONError(400, fmt.Errorf("account id is required"))
+	}
+
 	repositories, err := listRepositories(a.ecr)
 	if err != nil {
-		return fireball.NewJSONError(500, err)
+		return nil, err
 	}
 
 	for _, r := range repositories {
 		if err := removeFromRepositoryPolicy(a.ecr, r, accountID); err != nil {
-			return fireball.NewJSONError(500, err)
+			return nil, err
 		}
 	}
 
 	if err := a.access.RevokeAccess(accountID); err != nil {
-		return fireball.NewJSONError(500, err)
+		return nil, err
 	}
 
 	return fireball.NewJSONResponse(204, nil)
