@@ -6,19 +6,19 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 )
 
-type DynamoAccessManager struct {
+type DynamoAccountManager struct {
 	table    string
 	dynamodb dynamodbiface.DynamoDBAPI
 }
 
-func NewDynamoAccessManager(table string, dynamodb dynamodbiface.DynamoDBAPI) *DynamoAccessManager {
-	return &DynamoAccessManager{
+func NewDynamoAccountManager(table string, dynamodb dynamodbiface.DynamoDBAPI) *DynamoAccountManager {
+	return &DynamoAccountManager{
 		table:    table,
 		dynamodb: dynamodb,
 	}
 }
 
-func (d *DynamoAccessManager) GrantAccess(accountID string) error {
+func (d *DynamoAccountManager) GrantAccess(accountID string) error {
 	item := map[string]*dynamodb.AttributeValue{
 		"AccountID": {
 			S: &accountID,
@@ -40,7 +40,7 @@ func (d *DynamoAccessManager) GrantAccess(accountID string) error {
 	return nil
 }
 
-func (d *DynamoAccessManager) RevokeAccess(accountID string) error {
+func (d *DynamoAccountManager) RevokeAccess(accountID string) error {
 	key := map[string]*dynamodb.AttributeValue{
 		"AccountID": {
 			S: &accountID,
@@ -62,7 +62,7 @@ func (d *DynamoAccessManager) RevokeAccess(accountID string) error {
 	return nil
 }
 
-func (d *DynamoAccessManager) Accounts() ([]string, error) {
+func (d *DynamoAccountManager) Accounts() ([]string, error) {
 	input := &dynamodb.ScanInput{}
 	input.SetTableName(d.table)
 

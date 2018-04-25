@@ -16,8 +16,8 @@ func TestCreateRepository(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	mockAccessManager := mock.NewMockAccessManager(ctrl)
-	controller := NewRepositoryController(mockECR, mockAccessManager)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	validateCreateRepositoryInput := func(input *ecr.CreateRepositoryInput) {
 		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
@@ -41,7 +41,7 @@ func TestCreateRepository(t *testing.T) {
 		Do(validateGetRepositoryPolicyInput).
 		Return(&ecr.GetRepositoryPolicyOutput{}, nil)
 
-	mockAccessManager.EXPECT().
+	mockAccountManager.EXPECT().
 		Accounts().
 		Return([]string{"1", "2", "3"}, nil)
 
@@ -71,8 +71,8 @@ func TestCreateRepositoryFailsWithSlashes(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	mockAccessManager := mock.NewMockAccessManager(ctrl)
-	controller := NewRepositoryController(mockECR, mockAccessManager)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	c := generateContext(t, models.CreateRepositoryRequest{Name: "slash/test"}, map[string]string{"owner": "user"})
 	_, err := controller.CreateRepository(c)
@@ -86,8 +86,8 @@ func TestDeleteRepository(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	mockAccessManager := mock.NewMockAccessManager(ctrl)
-	controller := NewRepositoryController(mockECR, mockAccessManager)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	validateDeleteRepositoryInput := func(input *ecr.DeleteRepositoryInput) {
 		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
@@ -115,8 +115,8 @@ func TestGetRepository(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	mockAccessManager := mock.NewMockAccessManager(ctrl)
-	controller := NewRepositoryController(mockECR, mockAccessManager)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	validateDescribeRepositoriesInput := func(input *ecr.DescribeRepositoriesInput) {
 		if v, want := aws.StringValue(input.RepositoryNames[0]), "user/test"; v != want {
@@ -144,8 +144,8 @@ func TestListRepositories(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	mockAccessManager := mock.NewMockAccessManager(ctrl)
-	controller := NewRepositoryController(mockECR, mockAccessManager)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	mockECR.EXPECT().
 		DescribeRepositoriesPages(gomock.Any(), gomock.Any()).
@@ -162,8 +162,8 @@ func TestListRepositoryImages(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	mockAccessManager := mock.NewMockAccessManager(ctrl)
-	controller := NewRepositoryController(mockECR, mockAccessManager)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	validateListImagesInput := func(input *ecr.ListImagesInput, fn func(output *ecr.ListImagesOutput, lastPage bool) bool) {
 		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
@@ -187,8 +187,8 @@ func TestGetRepositoryImage(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	mockAccessManager := mock.NewMockAccessManager(ctrl)
-	controller := NewRepositoryController(mockECR, mockAccessManager)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	validateDescribeImagesInput := func(input *ecr.DescribeImagesInput) {
 		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
@@ -220,8 +220,8 @@ func TestDeleteRepositoryImage(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	mockAccessManager := mock.NewMockAccessManager(ctrl)
-	controller := NewRepositoryController(mockECR, mockAccessManager)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	validateBatchDeleteImageInput := func(input *ecr.BatchDeleteImageInput) {
 		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {

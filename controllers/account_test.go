@@ -12,18 +12,18 @@ func TestGrantAccess(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	mockAccessManager := mock.NewMockAccessManager(ctrl)
-	controller := NewAccessController(mockECR, mockAccessManager)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewAccountController(mockECR, mockAccountManager)
 
 	mockECR.EXPECT().
 		DescribeRepositoriesPages(gomock.Any(), gomock.Any()).
 		Return(nil)
 
-	mockAccessManager.EXPECT().
+	mockAccountManager.EXPECT().
 		Accounts().
 		Return([]string{}, nil)
 
-	mockAccessManager.EXPECT().
+	mockAccountManager.EXPECT().
 		GrantAccess(gomock.Any()).
 		Return(nil)
 
@@ -38,14 +38,14 @@ func TestRevokeAccess(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	mockAccessManager := mock.NewMockAccessManager(ctrl)
-	controller := NewAccessController(mockECR, mockAccessManager)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewAccountController(mockECR, mockAccountManager)
 
 	mockECR.EXPECT().
 		DescribeRepositoriesPages(gomock.Any(), gomock.Any()).
 		Return(nil)
 
-	mockAccessManager.EXPECT().
+	mockAccountManager.EXPECT().
 		RevokeAccess(gomock.Any()).
 		Return(nil)
 
@@ -60,10 +60,10 @@ func TestAccounts(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	mockAccessManager := mock.NewMockAccessManager(ctrl)
-	controller := NewAccessController(mockECR, mockAccessManager)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewAccountController(mockECR, mockAccountManager)
 
-	mockAccessManager.EXPECT().
+	mockAccountManager.EXPECT().
 		Accounts().
 		Return([]string{}, nil)
 

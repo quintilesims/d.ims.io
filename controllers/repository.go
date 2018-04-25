@@ -16,14 +16,14 @@ import (
 )
 
 type RepositoryController struct {
-	ecr    ecriface.ECRAPI
-	access auth.AccessManager
+	ecr     ecriface.ECRAPI
+	account auth.AccountManager
 }
 
-func NewRepositoryController(e ecriface.ECRAPI, a auth.AccessManager) *RepositoryController {
+func NewRepositoryController(e ecriface.ECRAPI, a auth.AccountManager) *RepositoryController {
 	return &RepositoryController{
-		ecr:    e,
-		access: a,
+		ecr:     e,
+		account: a,
 	}
 }
 
@@ -88,13 +88,13 @@ func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.R
 		return nil, err
 	}
 
-	accounts, err := r.access.Accounts()
+	accounts, err := r.account.Accounts()
 	if err != nil {
-		return nil, err
+		return fireball.NewJSONError(500, err)
 	}
 
 	if err := addToRepositoryPolicy(r.ecr, repo, accounts); err != nil {
-		return nil, err
+		return fireball.NewJSONError(500, err)
 	}
 
 	resp := models.CreateRepositoryResponse{
@@ -131,7 +131,7 @@ func (r *RepositoryController) addRepositoryPolicy(repo string) error {
 		}
 	}
 
-	accounts, err := r.access.Accounts()
+	accounts, err := r.account.Accounts()
 	if err != nil {
 		return err
 	}

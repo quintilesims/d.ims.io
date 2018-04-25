@@ -103,7 +103,7 @@ func main() {
 		ecr := ecr.New(session)
 
 		tokenManager := auth.NewDynamoTokenManager(c.String("dynamo-table"), dynamodb)
-		accessManager := auth.NewDynamoAccessManager(c.String("accounts-table"), dynamodb)
+		accountManager := auth.NewDynamoAccountManager(c.String("accounts-table"), dynamodb)
 		auth0Manager := auth.NewAuth0Manager(c.String("auth0-domain"),
 			c.String("auth0-client-id"),
 			c.String("auth0-connection"),
@@ -113,15 +113,15 @@ func main() {
 		proxy := proxy.NewECRProxy(c.String("registry-endpoint"))
 
 		rootController := controllers.NewRootController()
-		repositoryController := controllers.NewRepositoryController(ecr, accessManager)
-		accessController := controllers.NewAccessController(ecr, accessManager)
+		repositoryController := controllers.NewRepositoryController(ecr, accountManager)
+		accountController := controllers.NewAccountController(ecr, accountManager)
 		tokenController := controllers.NewTokenController(tokenManager)
 		proxyController := controllers.NewProxyController(ecr, proxy)
 		swaggerController := controllers.NewSwaggerController()
 
 		routes := rootController.Routes()
 		routes = append(routes, repositoryController.Routes()...)
-		routes = append(routes, accessController.Routes()...)
+		routes = append(routes, accountController.Routes()...)
 		routes = append(routes, tokenController.Routes()...)
 		routes = append(routes, swaggerController.Routes()...)
 		routes = fireball.Decorate(routes,

@@ -9,29 +9,24 @@ import (
 	"github.com/zpatrick/fireball"
 )
 
-type AccessController struct {
+type AccountController struct {
 	ecr    ecriface.ECRAPI
-	access auth.AccessManager
+	access auth.AccountManager
 }
 
-func NewAccessController(e ecriface.ECRAPI, a auth.AccessManager) *AccessController {
-	return &AccessController{
+func NewAccountController(e ecriface.ECRAPI, a auth.AccountManager) *AccountController {
+	return &AccountController{
 		ecr:    e,
 		access: a,
 	}
 }
 
-func (a *AccessController) Routes() []*fireball.Route {
+func (a *AccountController) Routes() []*fireball.Route {
 	return []*fireball.Route{
 		{
 			Path: "/account",
 			Handlers: fireball.Handlers{
-				"GET": a.ListAccounts,
-			},
-		},
-		{
-			Path: "/account/",
-			Handlers: fireball.Handlers{
+				"GET":  a.ListAccounts,
 				"POST": a.GrantAccess,
 			},
 		},
@@ -44,29 +39,29 @@ func (a *AccessController) Routes() []*fireball.Route {
 	}
 }
 
-func (a *AccessController) ListAccounts(c *fireball.Context) (fireball.Response, error) {
+func (a *AccountController) ListAccounts(c *fireball.Context) (fireball.Response, error) {
 	response, err := a.access.Accounts()
 	if err != nil {
 		return fireball.NewJSONError(500, err)
 	}
 
-	return fireball.NewJSONResponse(200, response)
+	return fireball.NewJSONResponse(200, models.ListAccountsResponse{Accounts: response})
 }
 
-func (a *AccessController) GrantAccess(c *fireball.Context) (fireball.Response, error) {
+func (a *AccountController) GrantAccess(c *fireball.Context) (fireball.Response, error) {
 	var request models.GrantAccessRequest
 	if err := json.NewDecoder(c.Request.Body).Decode(&request); err != nil {
-		return nil, err
+		return fireball.NewJSONError(400, err)
 	}
 
 	repositories, err := listRepositories(a.ecr)
 	if err != nil {
-		return nil, err
+		return fireball.NewJSONError(500, err)
 	}
 
 	accounts, err := a.access.Accounts()
 	if err != nil {
-		return nil, err
+		return fireball.NewJSONError(500, err)
 	}
 
 	for _, r := range repositories {
@@ -79,14 +74,14 @@ func (a *AccessController) GrantAccess(c *fireball.Context) (fireball.Response, 
 		return fireball.NewJSONError(500, err)
 	}
 
-	return fireball.NewJSONResponse(200, nil)
+	return fireball.NewJSONResponse(204, nil)
 }
 
-func (a *AccessController) RevokeAccess(c *fireball.Context) (fireball.Response, error) {
+func (a *AccountController) RevokeAccess(c *fireball.Context) (fireball.Response, error) {
 	accountID := c.PathVariables["id"]
 	repositories, err := listRepositories(a.ecr)
 	if err != nil {
-		return nil, err
+		return fireball.NewJSONError(500, err)
 	}
 
 	for _, r := range repositories {
@@ -99,5 +94,5 @@ func (a *AccessController) RevokeAccess(c *fireball.Context) (fireball.Response,
 		return fireball.NewJSONError(500, err)
 	}
 
-	return fireball.NewJSONResponse(200, nil)
+	return fireball.NewJSONResponse(204, nil)
 }

@@ -15,7 +15,7 @@ func TestDynamoGrantAccess(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockDynamoDB := mock.NewMockDynamoDBAPI(ctrl)
-	target := NewDynamoAccessManager("table", mockDynamoDB)
+	target := NewDynamoAccountManager("table", mockDynamoDB)
 
 	validatePutItemInput := func(input *dynamodb.PutItemInput) {
 		if v, want := aws.StringValue(input.TableName), "table"; v != want {
@@ -46,7 +46,7 @@ func TestDynamoRevokeAccess(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockDynamoDB := mock.NewMockDynamoDBAPI(ctrl)
-	target := NewDynamoAccessManager("table", mockDynamoDB)
+	target := NewDynamoAccountManager("table", mockDynamoDB)
 
 	validateDeleteItemInput := func(input *dynamodb.DeleteItemInput) {
 		if v, want := aws.StringValue(input.TableName), "table"; v != want {
@@ -73,7 +73,7 @@ func TestDynamoGetAccounts(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockDynamoDB := mock.NewMockDynamoDBAPI(ctrl)
-	target := NewDynamoAccessManager("table", mockDynamoDB)
+	target := NewDynamoAccountManager("table", mockDynamoDB)
 
 	validateScanInput := func(input *dynamodb.ScanInput) {
 		if v, want := aws.StringValue(input.TableName), "table"; v != want {
