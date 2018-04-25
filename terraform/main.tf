@@ -12,6 +12,18 @@ resource "aws_dynamodb_table" "dimsio" {
   }
 }
 
+resource "aws_dynamodb_table" "dimsio_account" {
+  name           = "${var.dynamodb_account_table_name}"
+  read_capacity  = "${var.dynamodb_read_capacity}"
+  write_capacity = "${var.dynamodb_write_capacity}"
+  hash_key       = "AccountID"
+
+  attribute {
+    name = "AccountID"
+    type = "S"
+  }
+}
+
 resource "aws_iam_user" "dimsio" {
   name = "${var.iam_user_name}"
 }

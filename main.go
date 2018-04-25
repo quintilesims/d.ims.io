@@ -65,9 +65,9 @@ func main() {
 			EnvVar: config.ENVVAR_DYNAMO_TABLE,
 		},
 		cli.StringFlag{
-			Name:   "accounts-table",
-			Value:  config.DEFAULT_ACCOUNTS_TABLE,
-			EnvVar: config.ENVVAR_ACCOUNTS_TABLE,
+			Name:   "account-table",
+			Value:  config.DEFAULT_ACCOUNT_TABLE,
+			EnvVar: config.ENVVAR_ACCOUNT_TABLE,
 		},
 		cli.StringFlag{
 			Name:   "registry-endpoint",
@@ -103,7 +103,7 @@ func main() {
 		ecr := ecr.New(session)
 
 		tokenManager := auth.NewDynamoTokenManager(c.String("dynamo-table"), dynamodb)
-		accountManager := auth.NewDynamoAccountManager(c.String("accounts-table"), dynamodb)
+		accountManager := auth.NewDynamoAccountManager(c.String("account-table"), dynamodb)
 		auth0Manager := auth.NewAuth0Manager(c.String("auth0-domain"),
 			c.String("auth0-client-id"),
 			c.String("auth0-connection"),
@@ -155,7 +155,7 @@ func validateConfig(c *cli.Context) error {
 		"aws-secret-key":    fmt.Errorf("AWS Secret Key not set! (EnvVar: %s)", config.ENVVAR_AWS_SECRET_KEY),
 		"aws-region":        fmt.Errorf("AWS Region not set! (EnvVar: %s)", config.ENVVAR_AWS_REGION),
 		"dynamo-table":      fmt.Errorf("Dynamo Table not set! (EnvVar: %s)", config.ENVVAR_DYNAMO_TABLE),
-		"accounts-table":    fmt.Errorf("Accounts Table not set! (EnvVar: %s)", config.ENVVAR_ACCOUNTS_TABLE),
+		"account-table":     fmt.Errorf("Account Table not set! (EnvVar: %s)", config.ENVVAR_ACCOUNT_TABLE),
 		"registry-endpoint": fmt.Errorf("Registry endpoint not set! (EnvVar: %s)", config.ENVVAR_REGISTRY_ENDPOINT),
 		"auth0-domain":      fmt.Errorf("Auth0 Domain not set! (EnvVar: %s)", config.ENVVAR_AUTH0_DOMAIN),
 		"auth0-client-id":   fmt.Errorf("Auth0 Client ID not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CLIENT_ID),
