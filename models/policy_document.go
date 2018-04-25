@@ -67,6 +67,10 @@ func (p *PolicyDocument) RemoveAWSAccountPrincipal(accountID string) {
 }
 
 func (p *PolicyDocument) RenderPolicyText() string {
+	if len(p.Statement) == 0 {
+		return ""
+	}
+
 	d, err := json.Marshal(p)
 	if err != nil {
 		//not expected to ever reach this code as PolicyDocument struct can always be marshaled
