@@ -41,7 +41,7 @@ func (d *DynamoAccountManager) GrantAccess(accountID string) error {
 }
 
 func (d *DynamoAccountManager) RevokeAccess(accountID string) error {
-	key := map[string]*dynamodb.AttributeValue{
+	item := map[string]*dynamodb.AttributeValue{
 		"AccountID": {
 			S: &accountID,
 		},
@@ -49,7 +49,7 @@ func (d *DynamoAccountManager) RevokeAccess(accountID string) error {
 
 	input := &dynamodb.DeleteItemInput{}
 	input.SetTableName(d.table)
-	input.SetKey(key)
+	input.SetKey(item)
 
 	if err := input.Validate(); err != nil {
 		return err
@@ -76,8 +76,7 @@ func (d *DynamoAccountManager) Accounts() ([]string, error) {
 	}
 
 	response := make([]string, len(output.Items))
-	i := 0
-	for _, v := range output.Items {
+	for i, v := range output.Items {
 		response[i] = aws.StringValue(v["AccountID"].S)
 		i++
 	}

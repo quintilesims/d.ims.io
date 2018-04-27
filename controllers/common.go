@@ -31,43 +31,40 @@ func listRepositories(e ecriface.ECRAPI) ([]string, error) {
 }
 
 func getRepositoryPolicy(e ecriface.ECRAPI, repositoryName string) (*models.PolicyDocument, error) {
-	policyDoc := &models.PolicyDocument{}
+	policy := &models.PolicyDocument{}
 
-	getPolicyInput := &ecr.GetRepositoryPolicyInput{}
-	getPolicyInput.SetRepositoryName(repositoryName)
-	if err := getPolicyInput.Validate(); err != nil {
+	input := &ecr.GetRepositoryPolicyInput{}
+	input.SetRepositoryName(repositoryName)
+	if err := input.Validate(); err != nil {
 		return nil, err
 	}
 
-	getPolicyOutput, err := e.GetRepositoryPolicy(getPolicyInput)
+	output, err := e.GetRepositoryPolicy(input)
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			if aerr.Code() != ecr.ErrCodeRepositoryPolicyNotFoundException {
-				return nil, err
-			}
-		} else {
+		// continue if the policy doesn't exist
+		if aerr, ok := err.(awserr.Error); !ok || aerr.Code() != ecr.ErrCodeRepositoryPolicyNotFoundException {
 			return nil, err
 		}
 	}
 
-	if getPolicyOutput.PolicyText != nil && aws.StringValue(getPolicyOutput.PolicyText) != "" {
-		if err := json.Unmarshal([]byte(aws.StringValue(getPolicyOutput.PolicyText)), policyDoc); err != nil {
+	if text := aws.StringValue(output.PolicyText); text != "" {
+		if err := json.Unmarshal([]byte(text), policy); err != nil {
 			return nil, err
 		}
 	}
 
-	return policyDoc, nil
+	return policy, nil
 }
 
 func setRepositoryPolicy(e ecriface.ECRAPI, repositoryName, policyText string) error {
-	policyInput := &ecr.SetRepositoryPolicyInput{}
-	policyInput.SetPolicyText(policyText)
-	policyInput.SetRepositoryName(repositoryName)
-	if err := policyInput.Validate(); err != nil {
+	input := &ecr.SetRepositoryPolicyInput{}
+	input.SetPolicyText(policyText)
+	input.SetRepositoryName(repositoryName)
+	if err := input.Validate(); err != nil {
 		return fireball.NewError(400, err, nil)
 	}
 
-	if _, err := e.SetRepositoryPolicy(policyInput); err != nil {
+	if _, err := e.SetRepositoryPolicy(input); err != nil {
 		return err
 	}
 

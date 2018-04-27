@@ -35,8 +35,8 @@ func TestGrantAccess(t *testing.T) {
 	fnListRepos := func(input *ecr.DescribeRepositoriesInput, fn func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool) error {
 		output := &ecr.DescribeRepositoriesOutput{
 			Repositories: []*ecr.Repository{
-				{RepositoryName: aws.String("user/name-1")},
-				{RepositoryName: aws.String("user/name-2")},
+				{RepositoryName: aws.String("user/name-*")},
+				{RepositoryName: aws.String("user/name-*")},
 			},
 		}
 
@@ -53,13 +53,20 @@ func TestGrantAccess(t *testing.T) {
 		Accounts().
 		Return([]string{"account-id"}, nil)
 
+	getPolicyInput := &ecr.GetRepositoryPolicyInput{}
+	getPolicyInput.SetRepositoryName("user/name-*")
 	mockECR.EXPECT().
-		GetRepositoryPolicy(gomock.Any()).
+		GetRepositoryPolicy(getPolicyInput).
 		Return(&ecr.GetRepositoryPolicyOutput{}, nil).
 		Times(2)
 
+	policyDoc := models.PolicyDocument{}
+	policyDoc.AddAWSAccountPrincipal("account-id")
+	setPolicyInput := &ecr.SetRepositoryPolicyInput{}
+	setPolicyInput.SetRepositoryName("user/name-*")
+	setPolicyInput.SetPolicyText(policyDoc.RenderPolicyText())
 	mockECR.EXPECT().
-		SetRepositoryPolicy(gomock.Any()).
+		SetRepositoryPolicy(setPolicyInput).
 		Return(&ecr.SetRepositoryPolicyOutput{}, nil).
 		Times(2)
 
@@ -117,12 +124,17 @@ func TestRevokeAccess(t *testing.T) {
 	getPolicyOutput := &ecr.GetRepositoryPolicyOutput{}
 	getPolicyOutput.SetPolicyText(policyDoc.RenderPolicyText())
 
+	getPolicyInput := &ecr.GetRepositoryPolicyInput{}
+	getPolicyInput.SetRepositoryName("user/name-1")
 	mockECR.EXPECT().
-		GetRepositoryPolicy(gomock.Any()).
+		GetRepositoryPolicy(getPolicyInput).
 		Return(getPolicyOutput, nil)
 
+	setPolicyInput := &ecr.SetRepositoryPolicyInput{}
+	setPolicyInput.SetRepositoryName("user/name-1")
+	setPolicyInput.SetPolicyText("")
 	mockECR.EXPECT().
-		SetRepositoryPolicy(gomock.Any()).
+		SetRepositoryPolicy(setPolicyInput).
 		Return(&ecr.SetRepositoryPolicyOutput{}, nil)
 
 	mockAccountManager.EXPECT().
