@@ -8,6 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/quintilesims/d.ims.io/mock"
 	"github.com/quintilesims/d.ims.io/models"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGrantAccessInputValidation(t *testing.T) {
@@ -19,9 +20,13 @@ func TestGrantAccessInputValidation(t *testing.T) {
 	controller := NewAccountController(mockECR, mockAccountManager)
 
 	c := generateContext(t, models.GrantAccessRequest{Account: ""}, nil)
-	if _, err := controller.GrantAccess(c); err == nil {
-		t.Fatal("expected error when GrantAccessRequest.Account is empty")
+	resp, err := controller.GrantAccess(c)
+	if err != nil {
+		t.Fatal(err)
 	}
+
+	recorder := unmarshalBody(t, resp, nil)
+	assert.Equal(t, 400, recorder.Code)
 }
 
 func TestGrantAccess(t *testing.T) {
@@ -71,7 +76,7 @@ func TestGrantAccess(t *testing.T) {
 		Times(2)
 
 	mockAccountManager.EXPECT().
-		GrantAccess(gomock.Any()).
+		GrantAccess("account-id").
 		Return(nil)
 
 	c := generateContext(t, models.GrantAccessRequest{Account: "account-id"}, nil)
@@ -89,9 +94,13 @@ func TestRevokeAccessInputValidation(t *testing.T) {
 	controller := NewAccountController(mockECR, mockAccountManager)
 
 	c := generateContext(t, nil, nil)
-	if _, err := controller.RevokeAccess(c); err == nil {
-		t.Fatal("expected error when id account id is not specified")
+	resp, err := controller.RevokeAccess(c)
+	if err != nil {
+		t.Fatal(err)
 	}
+
+	recorder := unmarshalBody(t, resp, nil)
+	assert.Equal(t, 400, recorder.Code)
 }
 
 func TestRevokeAccess(t *testing.T) {

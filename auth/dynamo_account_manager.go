@@ -78,7 +78,6 @@ func (d *DynamoAccountManager) Accounts() ([]string, error) {
 	response := make([]string, len(output.Items))
 	for i, v := range output.Items {
 		response[i] = aws.StringValue(v["AccountID"].S)
-		i++
 	}
 
 	return response, nil

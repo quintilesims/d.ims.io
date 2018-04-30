@@ -90,5 +90,5 @@ func TestDynamoGetAccounts(t *testing.T) {
 	}
 
 	expected := []string{"1", "2", "3"}
-	assert.Equal(t, expected, result)
+	assert.ElementsMatch(t, expected, result)
 }

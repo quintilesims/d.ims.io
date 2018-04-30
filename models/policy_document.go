@@ -39,7 +39,7 @@ func newStatement(accountID string) statement {
 	}
 }
 
-func (p *PolicyDocument) AddAWSAccountPrincipal(accountID string) {
+func (p *PolicyDocument) AddAWSAccountPrincipal(accountID string) bool {
 	permissionExists := false
 	for _, s := range p.Statement {
 		if s.Sid == accountID {
@@ -49,21 +49,28 @@ func (p *PolicyDocument) AddAWSAccountPrincipal(accountID string) {
 	}
 
 	if permissionExists {
-		return
+		return false
 	}
 
 	p.Statement = append(p.Statement, newStatement(accountID))
+	return true
 }
 
-func (p *PolicyDocument) RemoveAWSAccountPrincipal(accountID string) {
+func (p *PolicyDocument) RemoveAWSAccountPrincipal(accountID string) bool {
 	temp := []statement{}
+	result := false
+
 	for _, s := range p.Statement {
-		if s.Sid != accountID {
-			temp = append(temp, s)
+		if s.Sid == accountID {
+			result = true
+			continue
 		}
+
+		temp = append(temp, s)
 	}
 
 	p.Statement = temp
+	return result
 }
 
 func (p *PolicyDocument) RenderPolicyText() string {

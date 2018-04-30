@@ -52,11 +52,11 @@ func (a *AccountController) ListAccounts(c *fireball.Context) (fireball.Response
 func (a *AccountController) GrantAccess(c *fireball.Context) (fireball.Response, error) {
 	var request models.GrantAccessRequest
 	if err := json.NewDecoder(c.Request.Body).Decode(&request); err != nil {
-		return nil, fireball.NewError(400, err, nil)
+		return fireball.NewJSONError(400, err)
 	}
 
 	if err := request.Validate(); err != nil {
-		return nil, fireball.NewError(400, err, nil)
+		return fireball.NewJSONError(400, err)
 	}
 
 	repositories, err := listRepositories(a.ecr)
@@ -86,7 +86,7 @@ func (a *AccountController) GrantAccess(c *fireball.Context) (fireball.Response,
 func (a *AccountController) RevokeAccess(c *fireball.Context) (fireball.Response, error) {
 	accountID := c.PathVariables["id"]
 	if accountID == "" {
-		return nil, fireball.NewError(400, fmt.Errorf("account id is required"), nil)
+		return fireball.NewJSONError(400, fmt.Errorf("account id is required"))
 	}
 
 	repositories, err := listRepositories(a.ecr)

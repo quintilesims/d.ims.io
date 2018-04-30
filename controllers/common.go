@@ -9,7 +9,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
 	"github.com/quintilesims/d.ims.io/models"
-	"github.com/zpatrick/fireball"
 )
 
 func listRepositories(e ecriface.ECRAPI) ([]string, error) {
@@ -31,8 +30,6 @@ func listRepositories(e ecriface.ECRAPI) ([]string, error) {
 }
 
 func getRepositoryPolicy(e ecriface.ECRAPI, repositoryName string) (*models.PolicyDocument, error) {
-	policy := &models.PolicyDocument{}
-
 	input := &ecr.GetRepositoryPolicyInput{}
 	input.SetRepositoryName(repositoryName)
 	if err := input.Validate(); err != nil {
@@ -47,6 +44,7 @@ func getRepositoryPolicy(e ecriface.ECRAPI, repositoryName string) (*models.Poli
 		}
 	}
 
+	policy := &models.PolicyDocument{}
 	if text := aws.StringValue(output.PolicyText); text != "" {
 		if err := json.Unmarshal([]byte(text), policy); err != nil {
 			return nil, err
@@ -61,7 +59,7 @@ func setRepositoryPolicy(e ecriface.ECRAPI, repositoryName, policyText string) e
 	input.SetPolicyText(policyText)
 	input.SetRepositoryName(repositoryName)
 	if err := input.Validate(); err != nil {
-		return fireball.NewError(400, err, nil)
+		return err
 	}
 
 	if _, err := e.SetRepositoryPolicy(input); err != nil {
@@ -78,11 +76,7 @@ func removeFromRepositoryPolicy(e ecriface.ECRAPI, repositoryName string, accoun
 		return err
 	}
 
-	statementCount := len(policyDoc.Statement)
-	policyDoc.RemoveAWSAccountPrincipal(accountID)
-
-	// check if there was a change in the policy document
-	if len(policyDoc.Statement) == statementCount {
+	if !policyDoc.RemoveAWSAccountPrincipal(accountID) {
 		return nil
 	}
 
@@ -100,13 +94,15 @@ func addToRepositoryPolicy(e ecriface.ECRAPI, repositoryName string, accounts []
 		return err
 	}
 
-	statementCount := len(policyDoc.Statement)
+	policyChanged := false
 	for _, accountID := range accounts {
-		policyDoc.AddAWSAccountPrincipal(accountID)
+		if changed := policyDoc.AddAWSAccountPrincipal(accountID); changed {
+			policyChanged = changed
+		}
 	}
 
 	// check if there was change in the policy document
-	if len(policyDoc.Statement) == statementCount {
+	if !policyChanged {
 		return nil
 	}
 
