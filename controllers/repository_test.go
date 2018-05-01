@@ -25,8 +25,10 @@ func TestCreateRepository(t *testing.T) {
 		}
 	}
 
+	input := &ecr.CreateRepositoryInput{}
+	input.SetRepositoryName("user/test")
 	mockECR.EXPECT().
-		CreateRepository(gomock.Any()).
+		CreateRepository(input).
 		Do(validateCreateRepositoryInput).
 		Return(&ecr.CreateRepositoryOutput{}, nil)
 
@@ -36,8 +38,10 @@ func TestCreateRepository(t *testing.T) {
 		}
 	}
 
+	getPolicyInput := &ecr.GetRepositoryPolicyInput{}
+	getPolicyInput.SetRepositoryName("user/test")
 	mockECR.EXPECT().
-		GetRepositoryPolicy(gomock.Any()).
+		GetRepositoryPolicy(getPolicyInput).
 		Do(validateGetRepositoryPolicyInput).
 		Return(&ecr.GetRepositoryPolicyOutput{}, nil)
 
@@ -55,8 +59,20 @@ func TestCreateRepository(t *testing.T) {
 		}
 	}
 
+	policyDoc := models.PolicyDocument{}
+	policyDoc.AddAWSAccountPrincipal("1")
+	policyDoc.AddAWSAccountPrincipal("2")
+	policyDoc.AddAWSAccountPrincipal("3")
+	policyText, err := policyDoc.RenderPolicyText()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	setPolicyInput := &ecr.SetRepositoryPolicyInput{}
+	setPolicyInput.SetRepositoryName("user/test")
+	setPolicyInput.SetPolicyText(policyText)
 	mockECR.EXPECT().
-		SetRepositoryPolicy(gomock.Any()).
+		SetRepositoryPolicy(setPolicyInput).
 		Do(validateSetRepositoryPolicyInput).
 		Return(&ecr.SetRepositoryPolicyOutput{}, nil)
 

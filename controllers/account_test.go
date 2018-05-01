@@ -67,9 +67,14 @@ func TestGrantAccess(t *testing.T) {
 
 	policyDoc := models.PolicyDocument{}
 	policyDoc.AddAWSAccountPrincipal("account-id")
+	policyText, err := policyDoc.RenderPolicyText()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	setPolicyInput := &ecr.SetRepositoryPolicyInput{}
 	setPolicyInput.SetRepositoryName("user/name-*")
-	setPolicyInput.SetPolicyText(policyDoc.RenderPolicyText())
+	setPolicyInput.SetPolicyText(policyText)
 	mockECR.EXPECT().
 		SetRepositoryPolicy(setPolicyInput).
 		Return(&ecr.SetRepositoryPolicyOutput{}, nil).
@@ -129,9 +134,13 @@ func TestRevokeAccess(t *testing.T) {
 
 	policyDoc := &models.PolicyDocument{}
 	policyDoc.AddAWSAccountPrincipal("account-id")
+	policyText, err := policyDoc.RenderPolicyText()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	getPolicyOutput := &ecr.GetRepositoryPolicyOutput{}
-	getPolicyOutput.SetPolicyText(policyDoc.RenderPolicyText())
+	getPolicyOutput.SetPolicyText(policyText)
 
 	getPolicyInput := &ecr.GetRepositoryPolicyInput{}
 	getPolicyInput.SetRepositoryName("user/name-1")

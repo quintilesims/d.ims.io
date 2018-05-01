@@ -80,7 +80,12 @@ func removeFromRepositoryPolicy(e ecriface.ECRAPI, repositoryName string, accoun
 		return nil
 	}
 
-	return setRepositoryPolicy(e, repositoryName, policyDoc.RenderPolicyText())
+	policyText, err := policyDoc.RenderPolicyText()
+	if err != nil {
+		return err
+	}
+
+	return setRepositoryPolicy(e, repositoryName, policyText)
 }
 
 func addToRepositoryPolicy(e ecriface.ECRAPI, repositoryName string, accounts []string) error {
@@ -106,5 +111,10 @@ func addToRepositoryPolicy(e ecriface.ECRAPI, repositoryName string, accounts []
 		return nil
 	}
 
-	return setRepositoryPolicy(e, repositoryName, policyDoc.RenderPolicyText())
+	policyText, err := policyDoc.RenderPolicyText()
+	if err != nil {
+		return err
+	}
+
+	return setRepositoryPolicy(e, repositoryName, policyText)
 }
