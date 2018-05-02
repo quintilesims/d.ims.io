@@ -8,18 +8,21 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
+	"github.com/quintilesims/d.ims.io/auth"
 	"github.com/quintilesims/d.ims.io/models"
 	"github.com/zpatrick/fireball"
 	bytesize "github.com/zpatrick/go-bytesize"
 )
 
 type RepositoryController struct {
-	ecr ecriface.ECRAPI
+	ecr     ecriface.ECRAPI
+	account auth.AccountManager
 }
 
-func NewRepositoryController(e ecriface.ECRAPI) *RepositoryController {
+func NewRepositoryController(e ecriface.ECRAPI, a auth.AccountManager) *RepositoryController {
 	return &RepositoryController{
-		ecr: e,
+		ecr:     e,
+		account: a,
 	}
 }
 
@@ -84,6 +87,15 @@ func (r *RepositoryController) CreateRepository(c *fireball.Context) (fireball.R
 		return nil, err
 	}
 
+	accounts, err := r.account.Accounts()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := addToRepositoryPolicy(r.ecr, repo, accounts); err != nil {
+		return nil, err
+	}
+
 	resp := models.CreateRepositoryResponse{
 		Owner: owner,
 		Name:  req.Name,
@@ -139,16 +151,8 @@ func (r *RepositoryController) GetRepository(c *fireball.Context) (fireball.Resp
 }
 
 func (r *RepositoryController) ListRepositories(c *fireball.Context) (fireball.Response, error) {
-	repositories := []string{}
-	fn := func(output *ecr.DescribeRepositoriesOutput, lastPage bool) bool {
-		for _, repository := range output.Repositories {
-			repositories = append(repositories, aws.StringValue(repository.RepositoryName))
-		}
-
-		return !lastPage
-	}
-
-	if err := r.ecr.DescribeRepositoriesPages(&ecr.DescribeRepositoriesInput{}, fn); err != nil {
+	repositories, err := listRepositories(r.ecr)
+	if err != nil {
 		return nil, err
 	}
 
