@@ -21,6 +21,7 @@ SRC_REGION     - The aws_region of the source ECR repository
 DST_ACCESS_KEY - The aws_access_key_id for the destination ECR repository
 DST_SECRET_KEY - The aws_secret_access_key for the destination ECR repository
 DST_REGION     - The aws_region of the destination ECR repository
+DST_REPO_URI   - The URI of the destination ECR repository (e.g. `123456.dkr.ecr.us-west-2.amazonaws.com`)
 ```
 
 Optionally, you can update the `MAX_WORKERS` variable in `migrate.py` to make this process threaded. 
