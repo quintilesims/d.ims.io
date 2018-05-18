@@ -52,7 +52,6 @@ def calculate_catalog_diff(src, dst):
         image_diff = copy.deepcopy(repo.images)
         for src_image in repo.images:
             src_tag = src_image['imageTag']
-            
             for dst_image in dst[name].images:
                 dst_tag = dst_image['imageTag']
 
