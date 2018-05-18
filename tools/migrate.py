@@ -34,7 +34,6 @@ def get_catalog(client):
 
         images = []
         paginator = client.get_paginator('list_images')
-
         for output in paginator.paginate(repositoryName=name, filter={'tagStatus': 'TAGGED'}):
             images = images + output['imageIds']
 
