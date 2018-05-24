@@ -16,7 +16,8 @@ func TestCreateRepository(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	controller := NewRepositoryController(mockECR)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	validateCreateRepositoryInput := func(input *ecr.CreateRepositoryInput) {
 		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
@@ -24,10 +25,56 @@ func TestCreateRepository(t *testing.T) {
 		}
 	}
 
+	input := &ecr.CreateRepositoryInput{}
+	input.SetRepositoryName("user/test")
 	mockECR.EXPECT().
-		CreateRepository(gomock.Any()).
+		CreateRepository(input).
 		Do(validateCreateRepositoryInput).
 		Return(&ecr.CreateRepositoryOutput{}, nil)
+
+	validateGetRepositoryPolicyInput := func(input *ecr.GetRepositoryPolicyInput) {
+		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
+			t.Errorf("Name was '%v', expected '%v'", v, want)
+		}
+	}
+
+	getPolicyInput := &ecr.GetRepositoryPolicyInput{}
+	getPolicyInput.SetRepositoryName("user/test")
+	mockECR.EXPECT().
+		GetRepositoryPolicy(getPolicyInput).
+		Do(validateGetRepositoryPolicyInput).
+		Return(&ecr.GetRepositoryPolicyOutput{}, nil)
+
+	mockAccountManager.EXPECT().
+		Accounts().
+		Return([]string{"1", "2", "3"}, nil)
+
+	validateSetRepositoryPolicyInput := func(input *ecr.SetRepositoryPolicyInput) {
+		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
+			t.Errorf("Name was '%v', expected '%v'", v, want)
+		}
+
+		if len(aws.StringValue(input.PolicyText)) == 0 {
+			t.Error("Policy text expected to be not empty")
+		}
+	}
+
+	policyDoc := models.PolicyDocument{}
+	policyDoc.AddAWSAccountPrincipal("1")
+	policyDoc.AddAWSAccountPrincipal("2")
+	policyDoc.AddAWSAccountPrincipal("3")
+	policyText, err := policyDoc.RenderPolicyText()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	setPolicyInput := &ecr.SetRepositoryPolicyInput{}
+	setPolicyInput.SetRepositoryName("user/test")
+	setPolicyInput.SetPolicyText(policyText)
+	mockECR.EXPECT().
+		SetRepositoryPolicy(setPolicyInput).
+		Do(validateSetRepositoryPolicyInput).
+		Return(&ecr.SetRepositoryPolicyOutput{}, nil)
 
 	c := generateContext(t, models.CreateRepositoryRequest{Name: "test"}, map[string]string{"owner": "user"})
 	if _, err := controller.CreateRepository(c); err != nil {
@@ -40,7 +87,8 @@ func TestCreateRepositoryFailsWithSlashes(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	controller := NewRepositoryController(mockECR)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	c := generateContext(t, models.CreateRepositoryRequest{Name: "slash/test"}, map[string]string{"owner": "user"})
 	_, err := controller.CreateRepository(c)
@@ -54,7 +102,8 @@ func TestDeleteRepository(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	controller := NewRepositoryController(mockECR)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	validateDeleteRepositoryInput := func(input *ecr.DeleteRepositoryInput) {
 		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
@@ -82,7 +131,8 @@ func TestGetRepository(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	controller := NewRepositoryController(mockECR)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	validateDescribeRepositoriesInput := func(input *ecr.DescribeRepositoriesInput) {
 		if v, want := aws.StringValue(input.RepositoryNames[0]), "user/test"; v != want {
@@ -110,7 +160,8 @@ func TestListRepositories(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	controller := NewRepositoryController(mockECR)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	mockECR.EXPECT().
 		DescribeRepositoriesPages(gomock.Any(), gomock.Any()).
@@ -127,7 +178,8 @@ func TestListRepositoryImages(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	controller := NewRepositoryController(mockECR)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	validateListImagesInput := func(input *ecr.ListImagesInput, fn func(output *ecr.ListImagesOutput, lastPage bool) bool) {
 		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
@@ -151,7 +203,8 @@ func TestGetRepositoryImage(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	controller := NewRepositoryController(mockECR)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	validateDescribeImagesInput := func(input *ecr.DescribeImagesInput) {
 		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {
@@ -183,7 +236,8 @@ func TestDeleteRepositoryImage(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockECR := mock.NewMockECRAPI(ctrl)
-	controller := NewRepositoryController(mockECR)
+	mockAccountManager := mock.NewMockAccountManager(ctrl)
+	controller := NewRepositoryController(mockECR, mockAccountManager)
 
 	validateBatchDeleteImageInput := func(input *ecr.BatchDeleteImageInput) {
 		if v, want := aws.StringValue(input.RepositoryName), "user/test"; v != want {

@@ -2,6 +2,10 @@ variable "dynamodb_table_name" {
   default = "d.ims.io"
 }
 
+variable "dynamodb_account_table_name" {
+  default = "d.ims.io.account"
+}
+
 variable "dynamodb_read_capacity" {
   default = 1
 }

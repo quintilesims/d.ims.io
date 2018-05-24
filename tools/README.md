@@ -21,6 +21,7 @@ SRC_REGION     - The aws_region of the source ECR repository
 DST_ACCESS_KEY - The aws_access_key_id for the destination ECR repository
 DST_SECRET_KEY - The aws_secret_access_key for the destination ECR repository
 DST_REGION     - The aws_region of the destination ECR repository
+DST_REPO_URI   - The URI of the destination ECR repository (e.g. `123456.dkr.ecr.us-west-2.amazonaws.com`)
 ```
 
 Optionally, you can update the `MAX_WORKERS` variable in `migrate.py` to make this process threaded. 
@@ -32,4 +33,4 @@ python migrate.py
 
 Depending on how many repositories and the setting for `MAX_WORKERS`, this process can take hours and even days to complete.
 The script checks the diff between the two repositories before it starts migrating images, so it is ok to run this script 
-as many times as necessary.  
+as many times as necessary.
