@@ -46,8 +46,8 @@ variable "scale" {
   default     = 1
 }
 
-variable "certificate_name" {
-  description = "The name of the certificate to use on the load balancer"
+variable "certificate_arn" {
+  description = "The AWS ARN of the ACM certificate to use on the load balancer"
 }
 
 variable "docker_image" {
