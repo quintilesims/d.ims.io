@@ -49,10 +49,6 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 				Name:        "Image",
 				Description: "Methods for Images",
 			},
-			{
-				Name:        "Account",
-				Description: "Methods for Account Access",
-			},
 		},
 		Paths: map[string]swagger.Path{
 			"/token": map[string]swagger.Method{
@@ -209,47 +205,6 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 					},
 				},
 			},
-			"/account": map[string]swagger.Method{
-				"get": {
-					Tags:     []string{"Account"},
-					Summary:  "List all accounts that can access all the repositories",
-					Security: swagger.BasicAuthSecurity("login"),
-					Responses: map[string]swagger.Response{
-						"200": {
-							Description: "success",
-							Schema:      swagger.NewObjectSchema("ListAccountsResponse"),
-						},
-					},
-				},
-				"post": {
-					Tags:     []string{"Account"},
-					Summary:  "Grant access to an account",
-					Security: swagger.BasicAuthSecurity("login"),
-					Parameters: []swagger.Parameter{
-						swagger.NewBodyParam("GrantAccessRequest", "none", true),
-					},
-					Responses: map[string]swagger.Response{
-						"200": {
-							Description: "success",
-						},
-					},
-				},
-			},
-			"/account/{id}": map[string]swagger.Method{
-				"delete": {
-					Tags:    []string{"Account"},
-					Summary: "Revoke access from an account",
-					Parameters: []swagger.Parameter{
-						swagger.NewStringPathParam("account", "Account that you want to revoke access to", true),
-					},
-					Security: swagger.BasicAuthSecurity("login"),
-					Responses: map[string]swagger.Response{
-						"200": {
-							Description: "success",
-						},
-					},
-				},
-			},
 		},
 		Definitions: map[string]swagger.Definition{
 			"CreateRepositoryRequest":  models.CreateRepositoryRequest{}.Definition(),
@@ -259,8 +214,6 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 			"Repository":               models.Repository{}.Definition(),
 			"ListImagesResponse":       models.ListImagesResponse{}.Definition(),
 			"Image":                    models.Image{}.Definition(),
-			"ListAccountsResponse":     models.ListAccountsResponse{}.Definition(),
-			"GrantAccessRequest":       models.GrantAccessRequest{}.Definition(),
 		},
 		SecurityDefinitions: map[string]swagger.SecurityDefinition{
 			"login": {
