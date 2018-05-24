@@ -54,7 +54,7 @@ resource "layer0_load_balancer" "dimsio" {
     host_port      = "443"
     container_port = "80"
     protocol       = "https"
-    certificate    = "${var.certificate_name}"
+    certificate    = "${var.certificate_arn}"
   }
 
   health_check {
