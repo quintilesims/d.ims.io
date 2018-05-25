@@ -82,7 +82,7 @@ data "template_file" "dimsio" {
 
   vars {
     docker_image      = "${var.docker_image}"
-    debug             = "${var.debug}"
+    debug             = "${var.debug ? "true" : "false"}"
     aws_access_key    = "${aws_iam_access_key.dimsio.id}"
     aws_secret_key    = "${aws_iam_access_key.dimsio.secret}"
     aws_region        = "${var.aws_region}"
