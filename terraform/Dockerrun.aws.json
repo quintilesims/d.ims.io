@@ -13,7 +13,7 @@
                 },
                 {
                     "name": "DIMSIO_DEBUG",
-                    "value": "false"
+                    "value": "${debug}"
                 },                
                 {
                     "name": "DIMSIO_AWS_ACCESS_KEY",
