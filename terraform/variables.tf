@@ -14,6 +14,10 @@ variable "dynamodb_write_capacity" {
   default = 1
 }
 
+variable "debug" {
+  default = false
+}
+
 variable "s3_bucket_name" {
   default = "d.ims.io-backups"
 }
