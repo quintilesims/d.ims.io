@@ -125,7 +125,7 @@ func main() {
 		routes = append(routes, tokenController.Routes()...)
 		routes = append(routes, swaggerController.Routes()...)
 		routes = fireball.Decorate(routes,
-			fireball.LogDecorator(),
+			controllers.LogDecorator(),
 			controllers.AuthDecorator(authenticator))
 
 		routes = fireball.EnableCORS(routes)

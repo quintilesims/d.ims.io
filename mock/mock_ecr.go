@@ -5,11 +5,12 @@
 package mock
 
 import (
+	reflect "reflect"
+
 	aws "github.com/aws/aws-sdk-go/aws"
 	request "github.com/aws/aws-sdk-go/aws/request"
 	ecr "github.com/aws/aws-sdk-go/service/ecr"
 	gomock "github.com/golang/mock/gomock"
-	reflect "reflect"
 )
 
 // MockECRAPI is a mock of ECRAPI interface

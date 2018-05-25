@@ -5,8 +5,9 @@
 package vendor_pkg
 
 import (
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockIfc is a mock of Ifc interface
