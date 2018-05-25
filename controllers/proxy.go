@@ -57,7 +57,7 @@ func (p *ProxyController) getRegistryAuthToken() (string, error) {
 	}
 
 	token := aws.StringValue(output.AuthorizationData[0].AuthorizationToken)
-	p.cache.Addf("token", token, TOKEN_EXPIRY)
+	p.cache.Setf("token", token, TOKEN_EXPIRY)
 
 	return token, nil
 }

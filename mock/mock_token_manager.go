@@ -5,9 +5,8 @@
 package mock
 
 import (
-	reflect "reflect"
-
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
 // MockTokenManager is a mock of TokenManager interface
