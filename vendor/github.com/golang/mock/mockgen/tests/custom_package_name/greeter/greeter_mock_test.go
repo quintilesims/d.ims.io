@@ -5,9 +5,10 @@
 package greeter
 
 import (
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	v1 "github.com/golang/mock/mockgen/tests/custom_package_name/client/v1"
-	reflect "reflect"
 )
 
 // MockInputMaker is a mock of InputMaker interface
