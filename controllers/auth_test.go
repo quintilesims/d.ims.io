@@ -54,11 +54,7 @@ func TestAuthDecoratorCachesCredStatus(t *testing.T) {
 	for name, isValidCreds := range cases {
 		t.Run(name, func(t *testing.T) {
 			handler := func(c *fireball.Context) (fireball.Response, error) {
-				if isValidCreds {
-					return fireball.NewResponse(200, nil, nil), nil
-				}
-
-				return fireball.NewResponse(401, nil, nil), nil
+				return fireball.NewResponse(200, nil, nil), nil
 			}
 
 			var authenticatorCalls int
