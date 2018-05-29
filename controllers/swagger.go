@@ -183,7 +183,7 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 					Parameters: []swagger.Parameter{
 						swagger.NewStringPathParam("owner", "Owner of the Repository", true),
 						swagger.NewStringPathParam("name", "Name of the Repository", true),
-						swagger.NewStringPathParam("tag", "Tag of the Image to delete", true),
+						swagger.NewStringPathParam("tag", "Tag of the Image to view", true),
 					},
 					Security: swagger.BasicAuthSecurity("login"),
 					Responses: map[string]swagger.Response{
