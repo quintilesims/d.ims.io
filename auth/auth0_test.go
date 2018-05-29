@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAuth0ManagerAuthenticate_ValidCreds(t *testing.T) {
+func TestAuth0AuthenticatorAuthenticate_ValidCreds(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, "POST")
 		assert.Equal(t, r.URL.Path, "/oauth/ro")
@@ -21,10 +21,10 @@ func TestAuth0ManagerAuthenticate_ValidCreds(t *testing.T) {
 		MarshalAndWrite(t, w, nil, 200)
 	}
 
-	auth0Manager, server := newAuth0ManagerAndServer(handler)
+	auth0Authenticator, server := newAuth0AuthenticatorAndServer(handler)
 	defer server.Close()
 
-	valid, err := auth0Manager.Authenticate("valid username", "valid password")
+	valid, err := auth0Authenticator.Authenticate("valid username", "valid password")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func TestAuth0ManagerAuthenticate_ValidCreds(t *testing.T) {
 	assert.Equal(t, valid, true)
 }
 
-func TestAuth0ManagerAuthenticate_InvalidCreds(t *testing.T) {
+func TestAuth0AuthenticatorAuthenticate_InvalidCreds(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, "POST")
 		assert.Equal(t, r.URL.Path, "/oauth/ro")
@@ -46,10 +46,10 @@ func TestAuth0ManagerAuthenticate_InvalidCreds(t *testing.T) {
 		MarshalAndWrite(t, w, nil, 401)
 	}
 
-	auth0Manager, server := newAuth0ManagerAndServer(handler)
+	auth0Authenticator, server := newAuth0AuthenticatorAndServer(handler)
 	defer server.Close()
 
-	valid, err := auth0Manager.Authenticate("invalid username", "invalid password")
+	valid, err := auth0Authenticator.Authenticate("invalid username", "invalid password")
 	if err != nil {
 		t.Fatal(err)
 	}

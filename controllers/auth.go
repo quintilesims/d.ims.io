@@ -33,6 +33,8 @@ func AuthDecorator(auth auth.Authenticator) fireball.Decorator {
 				return invalidAuthResponse, nil
 			}
 
+			log.Printf("[DEBUG] Attempting to authenticate user '%s'", user)
+
 			key := hash(user, pass)
 			isValidCreds, ok := cache.Getf(key)
 			if ok && isValidCreds.(bool) {
@@ -52,7 +54,7 @@ func AuthDecorator(auth auth.Authenticator) fireball.Decorator {
 			}
 
 			if !isAuthenticated {
-				log.Printf("[DEBUG] User '%s' failed to authenticate: %v", user, err)
+				log.Printf("[DEBUG] User '%s' failed to authenticate", user)
 				cache.Set(key, false)
 				return invalidAuthResponse, nil
 			}

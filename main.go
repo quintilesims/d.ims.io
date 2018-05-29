@@ -100,12 +100,13 @@ func main() {
 
 		tokenManager := auth.NewDynamoTokenManager(c.String("dynamo-table"), dynamodb)
 		accountManager := auth.NewDynamoAccountManager(c.String("account-table"), dynamodb)
-		auth0Manager := auth.NewAuth0Manager(c.String("auth0-domain"),
+		auth0Authenticator := auth.NewAuth0Authenticator(
+			c.String("auth0-domain"),
 			c.String("auth0-client-id"),
 			c.String("auth0-connection"),
 			time.Second/2)
 
-		authenticator := auth.NewCompositeAuthenticator(tokenManager, auth0Manager)
+		authenticator := auth.NewCompositeAuthenticator(tokenManager, auth0Authenticator)
 		proxy := proxy.NewECRProxy(c.String("registry-endpoint"))
 
 		rootController := controllers.NewRootController()
@@ -147,14 +148,14 @@ func main() {
 
 func validateConfig(c *cli.Context) error {
 	vars := map[string]error{
-		"aws-access-key":    fmt.Errorf("AWS Access Key not set! (EnvVar: %s)", config.ENVVAR_AWS_ACCESS_KEY),
-		"aws-secret-key":    fmt.Errorf("AWS Secret Key not set! (EnvVar: %s)", config.ENVVAR_AWS_SECRET_KEY),
-		"aws-region":        fmt.Errorf("AWS Region not set! (EnvVar: %s)", config.ENVVAR_AWS_REGION),
-		"dynamo-table":      fmt.Errorf("Dynamo Table not set! (EnvVar: %s)", config.ENVVAR_DYNAMO_TABLE),
-		"account-table":     fmt.Errorf("Account Table not set! (EnvVar: %s)", config.ENVVAR_ACCOUNT_TABLE),
-		"auth0-domain":      fmt.Errorf("Auth0 Domain not set! (EnvVar: %s)", config.ENVVAR_AUTH0_DOMAIN),
-		"auth0-client-id":   fmt.Errorf("Auth0 Client ID not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CLIENT_ID),
-		"auth0-connection":  fmt.Errorf("Auth0 Connection not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CONNECTION),
+		"aws-access-key":   fmt.Errorf("AWS Access Key not set! (EnvVar: %s)", config.ENVVAR_AWS_ACCESS_KEY),
+		"aws-secret-key":   fmt.Errorf("AWS Secret Key not set! (EnvVar: %s)", config.ENVVAR_AWS_SECRET_KEY),
+		"aws-region":       fmt.Errorf("AWS Region not set! (EnvVar: %s)", config.ENVVAR_AWS_REGION),
+		"dynamo-table":     fmt.Errorf("Dynamo Table not set! (EnvVar: %s)", config.ENVVAR_DYNAMO_TABLE),
+		"account-table":    fmt.Errorf("Account Table not set! (EnvVar: %s)", config.ENVVAR_ACCOUNT_TABLE),
+		"auth0-domain":     fmt.Errorf("Auth0 Domain not set! (EnvVar: %s)", config.ENVVAR_AUTH0_DOMAIN),
+		"auth0-client-id":  fmt.Errorf("Auth0 Client ID not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CLIENT_ID),
+		"auth0-connection": fmt.Errorf("Auth0 Connection not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CONNECTION),
 	}
 
 	for name, err := range vars {

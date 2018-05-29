@@ -7,7 +7,7 @@ import (
 	"github.com/zpatrick/rclient"
 )
 
-type Auth0Manager struct {
+type Auth0Authenticator struct {
 	clientID   string
 	connection string
 	client     *rclient.RestClient
@@ -23,8 +23,8 @@ type oauthReq struct {
 	Scope      string `json:"scope"`
 }
 
-func NewAuth0Manager(domain, clientID, connection string, rateLimit time.Duration) *Auth0Manager {
-	return &Auth0Manager{
+func NewAuth0Authenticator(domain, clientID, connection string, rateLimit time.Duration) *Auth0Authenticator {
+	return &Auth0Authenticator{
 		clientID:   clientID,
 		connection: connection,
 		client:     rclient.NewRestClient(domain),
@@ -32,7 +32,7 @@ func NewAuth0Manager(domain, clientID, connection string, rateLimit time.Duratio
 	}
 }
 
-func (a *Auth0Manager) Authenticate(username, password string) (bool, error) {
+func (a *Auth0Authenticator) Authenticate(username, password string) (bool, error) {
 	log.Printf("[DEBUG] Attempting to authenticate user '%s' through Auth0", username)
 
 	req := oauthReq{

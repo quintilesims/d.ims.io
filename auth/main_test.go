@@ -4,17 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 )
 
+func init() {
+	log.SetOutput(ioutil.Discard)
+}
+
 type Handler func(w http.ResponseWriter, r *http.Request)
 
-func newAuth0ManagerAndServer(handler Handler) (*Auth0Manager, *httptest.Server) {
+func newAuth0AuthenticatorAndServer(handler Handler) (*Auth0Authenticator, *httptest.Server) {
 	server := httptest.NewServer(http.HandlerFunc(handler))
-	auth0Manager := NewAuth0Manager(server.URL, "", "", time.Second/2)
+	auth0Manager := NewAuth0Authenticator(server.URL, "", "", time.Second/2)
 
 	return auth0Manager, server
 }
