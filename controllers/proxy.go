@@ -15,7 +15,7 @@ import (
 )
 
 // ecr tokens last for 12 hours: https://github.com/aws/aws-sdk-go/blob/master/service/ecr/api.go#L1022
-const TOKEN_EXPIRY = time.Hour * 12
+const TokenExpiry = time.Hour * 12
 
 type ProxyController struct {
 	ecr   ecriface.ECRAPI
@@ -46,7 +46,7 @@ func (p *ProxyController) DoProxy(c *fireball.Context) (fireball.Response, error
 }
 
 func (p *ProxyController) getRegistryAuthToken() (string, error) {
-	if token, ok := p.cache.Getf("token"); ok {
+	if token, ok := p.cache.GetOK("token"); ok {
 		return token.(string), nil
 	}
 
@@ -57,7 +57,7 @@ func (p *ProxyController) getRegistryAuthToken() (string, error) {
 	}
 
 	token := aws.StringValue(output.AuthorizationData[0].AuthorizationToken)
-	p.cache.Setf("token", token, TOKEN_EXPIRY)
+	p.cache.Set("token", token, cache.Expire(TokenExpiry))
 
 	return token, nil
 }
