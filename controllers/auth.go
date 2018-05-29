@@ -21,7 +21,7 @@ func hash(user, pass string) string {
 }
 
 func AuthDecorator(auth auth.Authenticator) fireball.Decorator {
-	cache := cache.New()
+	che := cache.New()
 	return func(handler fireball.Handler) fireball.Handler {
 		return func(c *fireball.Context) (fireball.Response, error) {
 			headers := map[string]string{"WWW-Authenticate": "Basic realm=\"Restricted\""}
@@ -36,7 +36,7 @@ func AuthDecorator(auth auth.Authenticator) fireball.Decorator {
 			log.Printf("[DEBUG] Attempting to authenticate user '%s'", user)
 
 			key := hash(user, pass)
-			isValidCreds, ok := cache.Getf(key)
+			isValidCreds, ok := che.GetOK(key)
 			if ok && isValidCreds.(bool) {
 				log.Printf("[DEBUG] Allowing valid cached creds for user '%s'", user)
 				return handler(c)
@@ -55,12 +55,12 @@ func AuthDecorator(auth auth.Authenticator) fireball.Decorator {
 
 			if !isAuthenticated {
 				log.Printf("[DEBUG] User '%s' failed to authenticate", user)
-				cache.Set(key, false)
+				che.Set(key, false)
 				return invalidAuthResponse, nil
 			}
 
 			log.Printf("[DEBUG] User '%s' successfully authenticated", user)
-			cache.Setf(key, true, validAuthExpiry)
+			che.Set(key, true, cache.Expire(validAuthExpiry))
 			return handler(c)
 		}
 	}

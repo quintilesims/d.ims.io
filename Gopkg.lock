@@ -52,7 +52,7 @@
   branch = "master"
   name = "github.com/zpatrick/fireball"
   packages = ["."]
-  revision = "ba90075a192d4e3d645bc6b090d0bee35bde0feb"
+  revision = "d403e9ac7715bf7999775d86c3065eeeb1593585"
 
 [[projects]]
   branch = "master"
@@ -64,7 +64,7 @@
   branch = "master"
   name = "github.com/zpatrick/go-cache"
   packages = ["."]
-  revision = "93cff70c1ab05a31fc0545db618869eb92d21d76"
+  revision = "bc4fba9e493a2145c9d5d9f8d834a4989757ced5"
 
 [[projects]]
   branch = "master"
