@@ -70,10 +70,6 @@ func main() {
 			EnvVar: config.ENVVAR_ACCOUNT_TABLE,
 		},
 		cli.StringFlag{
-			Name:   "registry-endpoint",
-			EnvVar: config.ENVVAR_REGISTRY_ENDPOINT,
-		},
-		cli.StringFlag{
 			Name:   "auth0-domain",
 			Value:  config.DEFAULT_AUTH0_DOMAIN,
 			EnvVar: config.ENVVAR_AUTH0_DOMAIN,
@@ -156,7 +152,6 @@ func validateConfig(c *cli.Context) error {
 		"aws-region":        fmt.Errorf("AWS Region not set! (EnvVar: %s)", config.ENVVAR_AWS_REGION),
 		"dynamo-table":      fmt.Errorf("Dynamo Table not set! (EnvVar: %s)", config.ENVVAR_DYNAMO_TABLE),
 		"account-table":     fmt.Errorf("Account Table not set! (EnvVar: %s)", config.ENVVAR_ACCOUNT_TABLE),
-		"registry-endpoint": fmt.Errorf("Registry endpoint not set! (EnvVar: %s)", config.ENVVAR_REGISTRY_ENDPOINT),
 		"auth0-domain":      fmt.Errorf("Auth0 Domain not set! (EnvVar: %s)", config.ENVVAR_AUTH0_DOMAIN),
 		"auth0-client-id":   fmt.Errorf("Auth0 Client ID not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CLIENT_ID),
 		"auth0-connection":  fmt.Errorf("Auth0 Connection not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CONNECTION),
