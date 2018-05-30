@@ -101,3 +101,12 @@ module "backup" {
   backup_s3_bucket_name     = "${var.s3_bucket_name}"
   lambda_function_name      = "${var.lambda_function_name}"
 }
+
+module "backup_accounts" {
+  source                    = "github.com/quintilesims/terraform-ddb-table-backup"
+  dynamodb_table_name       = "${aws_dynamodb_table.dimsio_account.name}"
+  dynamodb_table_arn        = "${aws_dynamodb_table.dimsio_account.arn}"
+  dynamodb_table_stream_arn = "${aws_dynamodb_table.dimsio_account.stream_arn}"
+  backup_s3_bucket_name     = "${var.s3_bucket_name}"
+  lambda_function_name      = "${var.lambda_function_name_account}"
+}

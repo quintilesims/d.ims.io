@@ -78,3 +78,7 @@ variable "auth0_client_id" {
 variable "lambda_function_name" {
   default = "dimsio_backups"
 }
+
+variable "lambda_function_name_account" {
+  default = "dimsio_account_backups"
+}
