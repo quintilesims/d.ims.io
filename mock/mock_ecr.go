@@ -256,6 +256,50 @@ func (mr *MockECRAPIMockRecorder) CreateRepositoryWithContext(arg0, arg1 interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRepositoryWithContext", reflect.TypeOf((*MockECRAPI)(nil).CreateRepositoryWithContext), varargs...)
 }
 
+// DeleteLifecyclePolicy mocks base method
+func (m *MockECRAPI) DeleteLifecyclePolicy(arg0 *ecr.DeleteLifecyclePolicyInput) (*ecr.DeleteLifecyclePolicyOutput, error) {
+	ret := m.ctrl.Call(m, "DeleteLifecyclePolicy", arg0)
+	ret0, _ := ret[0].(*ecr.DeleteLifecyclePolicyOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteLifecyclePolicy indicates an expected call of DeleteLifecyclePolicy
+func (mr *MockECRAPIMockRecorder) DeleteLifecyclePolicy(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteLifecyclePolicy", reflect.TypeOf((*MockECRAPI)(nil).DeleteLifecyclePolicy), arg0)
+}
+
+// DeleteLifecyclePolicyRequest mocks base method
+func (m *MockECRAPI) DeleteLifecyclePolicyRequest(arg0 *ecr.DeleteLifecyclePolicyInput) (*request.Request, *ecr.DeleteLifecyclePolicyOutput) {
+	ret := m.ctrl.Call(m, "DeleteLifecyclePolicyRequest", arg0)
+	ret0, _ := ret[0].(*request.Request)
+	ret1, _ := ret[1].(*ecr.DeleteLifecyclePolicyOutput)
+	return ret0, ret1
+}
+
+// DeleteLifecyclePolicyRequest indicates an expected call of DeleteLifecyclePolicyRequest
+func (mr *MockECRAPIMockRecorder) DeleteLifecyclePolicyRequest(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteLifecyclePolicyRequest", reflect.TypeOf((*MockECRAPI)(nil).DeleteLifecyclePolicyRequest), arg0)
+}
+
+// DeleteLifecyclePolicyWithContext mocks base method
+func (m *MockECRAPI) DeleteLifecyclePolicyWithContext(arg0 aws.Context, arg1 *ecr.DeleteLifecyclePolicyInput, arg2 ...request.Option) (*ecr.DeleteLifecyclePolicyOutput, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteLifecyclePolicyWithContext", varargs...)
+	ret0, _ := ret[0].(*ecr.DeleteLifecyclePolicyOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteLifecyclePolicyWithContext indicates an expected call of DeleteLifecyclePolicyWithContext
+func (mr *MockECRAPIMockRecorder) DeleteLifecyclePolicyWithContext(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteLifecyclePolicyWithContext", reflect.TypeOf((*MockECRAPI)(nil).DeleteLifecyclePolicyWithContext), varargs...)
+}
+
 // DeleteRepository mocks base method
 func (m *MockECRAPI) DeleteRepository(arg0 *ecr.DeleteRepositoryInput) (*ecr.DeleteRepositoryOutput, error) {
 	ret := m.ctrl.Call(m, "DeleteRepository", arg0)
@@ -578,6 +622,94 @@ func (mr *MockECRAPIMockRecorder) GetDownloadUrlForLayerWithContext(arg0, arg1 i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDownloadUrlForLayerWithContext", reflect.TypeOf((*MockECRAPI)(nil).GetDownloadUrlForLayerWithContext), varargs...)
 }
 
+// GetLifecyclePolicy mocks base method
+func (m *MockECRAPI) GetLifecyclePolicy(arg0 *ecr.GetLifecyclePolicyInput) (*ecr.GetLifecyclePolicyOutput, error) {
+	ret := m.ctrl.Call(m, "GetLifecyclePolicy", arg0)
+	ret0, _ := ret[0].(*ecr.GetLifecyclePolicyOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLifecyclePolicy indicates an expected call of GetLifecyclePolicy
+func (mr *MockECRAPIMockRecorder) GetLifecyclePolicy(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLifecyclePolicy", reflect.TypeOf((*MockECRAPI)(nil).GetLifecyclePolicy), arg0)
+}
+
+// GetLifecyclePolicyPreview mocks base method
+func (m *MockECRAPI) GetLifecyclePolicyPreview(arg0 *ecr.GetLifecyclePolicyPreviewInput) (*ecr.GetLifecyclePolicyPreviewOutput, error) {
+	ret := m.ctrl.Call(m, "GetLifecyclePolicyPreview", arg0)
+	ret0, _ := ret[0].(*ecr.GetLifecyclePolicyPreviewOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLifecyclePolicyPreview indicates an expected call of GetLifecyclePolicyPreview
+func (mr *MockECRAPIMockRecorder) GetLifecyclePolicyPreview(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLifecyclePolicyPreview", reflect.TypeOf((*MockECRAPI)(nil).GetLifecyclePolicyPreview), arg0)
+}
+
+// GetLifecyclePolicyPreviewRequest mocks base method
+func (m *MockECRAPI) GetLifecyclePolicyPreviewRequest(arg0 *ecr.GetLifecyclePolicyPreviewInput) (*request.Request, *ecr.GetLifecyclePolicyPreviewOutput) {
+	ret := m.ctrl.Call(m, "GetLifecyclePolicyPreviewRequest", arg0)
+	ret0, _ := ret[0].(*request.Request)
+	ret1, _ := ret[1].(*ecr.GetLifecyclePolicyPreviewOutput)
+	return ret0, ret1
+}
+
+// GetLifecyclePolicyPreviewRequest indicates an expected call of GetLifecyclePolicyPreviewRequest
+func (mr *MockECRAPIMockRecorder) GetLifecyclePolicyPreviewRequest(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLifecyclePolicyPreviewRequest", reflect.TypeOf((*MockECRAPI)(nil).GetLifecyclePolicyPreviewRequest), arg0)
+}
+
+// GetLifecyclePolicyPreviewWithContext mocks base method
+func (m *MockECRAPI) GetLifecyclePolicyPreviewWithContext(arg0 aws.Context, arg1 *ecr.GetLifecyclePolicyPreviewInput, arg2 ...request.Option) (*ecr.GetLifecyclePolicyPreviewOutput, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetLifecyclePolicyPreviewWithContext", varargs...)
+	ret0, _ := ret[0].(*ecr.GetLifecyclePolicyPreviewOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLifecyclePolicyPreviewWithContext indicates an expected call of GetLifecyclePolicyPreviewWithContext
+func (mr *MockECRAPIMockRecorder) GetLifecyclePolicyPreviewWithContext(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLifecyclePolicyPreviewWithContext", reflect.TypeOf((*MockECRAPI)(nil).GetLifecyclePolicyPreviewWithContext), varargs...)
+}
+
+// GetLifecyclePolicyRequest mocks base method
+func (m *MockECRAPI) GetLifecyclePolicyRequest(arg0 *ecr.GetLifecyclePolicyInput) (*request.Request, *ecr.GetLifecyclePolicyOutput) {
+	ret := m.ctrl.Call(m, "GetLifecyclePolicyRequest", arg0)
+	ret0, _ := ret[0].(*request.Request)
+	ret1, _ := ret[1].(*ecr.GetLifecyclePolicyOutput)
+	return ret0, ret1
+}
+
+// GetLifecyclePolicyRequest indicates an expected call of GetLifecyclePolicyRequest
+func (mr *MockECRAPIMockRecorder) GetLifecyclePolicyRequest(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLifecyclePolicyRequest", reflect.TypeOf((*MockECRAPI)(nil).GetLifecyclePolicyRequest), arg0)
+}
+
+// GetLifecyclePolicyWithContext mocks base method
+func (m *MockECRAPI) GetLifecyclePolicyWithContext(arg0 aws.Context, arg1 *ecr.GetLifecyclePolicyInput, arg2 ...request.Option) (*ecr.GetLifecyclePolicyOutput, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetLifecyclePolicyWithContext", varargs...)
+	ret0, _ := ret[0].(*ecr.GetLifecyclePolicyOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLifecyclePolicyWithContext indicates an expected call of GetLifecyclePolicyWithContext
+func (mr *MockECRAPIMockRecorder) GetLifecyclePolicyWithContext(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLifecyclePolicyWithContext", reflect.TypeOf((*MockECRAPI)(nil).GetLifecyclePolicyWithContext), varargs...)
+}
+
 // GetRepositoryPolicy mocks base method
 func (m *MockECRAPI) GetRepositoryPolicy(arg0 *ecr.GetRepositoryPolicyInput) (*ecr.GetRepositoryPolicyOutput, error) {
 	ret := m.ctrl.Call(m, "GetRepositoryPolicy", arg0)
@@ -783,6 +915,50 @@ func (mr *MockECRAPIMockRecorder) PutImageWithContext(arg0, arg1 interface{}, ar
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutImageWithContext", reflect.TypeOf((*MockECRAPI)(nil).PutImageWithContext), varargs...)
 }
 
+// PutLifecyclePolicy mocks base method
+func (m *MockECRAPI) PutLifecyclePolicy(arg0 *ecr.PutLifecyclePolicyInput) (*ecr.PutLifecyclePolicyOutput, error) {
+	ret := m.ctrl.Call(m, "PutLifecyclePolicy", arg0)
+	ret0, _ := ret[0].(*ecr.PutLifecyclePolicyOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PutLifecyclePolicy indicates an expected call of PutLifecyclePolicy
+func (mr *MockECRAPIMockRecorder) PutLifecyclePolicy(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutLifecyclePolicy", reflect.TypeOf((*MockECRAPI)(nil).PutLifecyclePolicy), arg0)
+}
+
+// PutLifecyclePolicyRequest mocks base method
+func (m *MockECRAPI) PutLifecyclePolicyRequest(arg0 *ecr.PutLifecyclePolicyInput) (*request.Request, *ecr.PutLifecyclePolicyOutput) {
+	ret := m.ctrl.Call(m, "PutLifecyclePolicyRequest", arg0)
+	ret0, _ := ret[0].(*request.Request)
+	ret1, _ := ret[1].(*ecr.PutLifecyclePolicyOutput)
+	return ret0, ret1
+}
+
+// PutLifecyclePolicyRequest indicates an expected call of PutLifecyclePolicyRequest
+func (mr *MockECRAPIMockRecorder) PutLifecyclePolicyRequest(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutLifecyclePolicyRequest", reflect.TypeOf((*MockECRAPI)(nil).PutLifecyclePolicyRequest), arg0)
+}
+
+// PutLifecyclePolicyWithContext mocks base method
+func (m *MockECRAPI) PutLifecyclePolicyWithContext(arg0 aws.Context, arg1 *ecr.PutLifecyclePolicyInput, arg2 ...request.Option) (*ecr.PutLifecyclePolicyOutput, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "PutLifecyclePolicyWithContext", varargs...)
+	ret0, _ := ret[0].(*ecr.PutLifecyclePolicyOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PutLifecyclePolicyWithContext indicates an expected call of PutLifecyclePolicyWithContext
+func (mr *MockECRAPIMockRecorder) PutLifecyclePolicyWithContext(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutLifecyclePolicyWithContext", reflect.TypeOf((*MockECRAPI)(nil).PutLifecyclePolicyWithContext), varargs...)
+}
+
 // SetRepositoryPolicy mocks base method
 func (m *MockECRAPI) SetRepositoryPolicy(arg0 *ecr.SetRepositoryPolicyInput) (*ecr.SetRepositoryPolicyOutput, error) {
 	ret := m.ctrl.Call(m, "SetRepositoryPolicy", arg0)
@@ -825,6 +1001,50 @@ func (m *MockECRAPI) SetRepositoryPolicyWithContext(arg0 aws.Context, arg1 *ecr.
 func (mr *MockECRAPIMockRecorder) SetRepositoryPolicyWithContext(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetRepositoryPolicyWithContext", reflect.TypeOf((*MockECRAPI)(nil).SetRepositoryPolicyWithContext), varargs...)
+}
+
+// StartLifecyclePolicyPreview mocks base method
+func (m *MockECRAPI) StartLifecyclePolicyPreview(arg0 *ecr.StartLifecyclePolicyPreviewInput) (*ecr.StartLifecyclePolicyPreviewOutput, error) {
+	ret := m.ctrl.Call(m, "StartLifecyclePolicyPreview", arg0)
+	ret0, _ := ret[0].(*ecr.StartLifecyclePolicyPreviewOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StartLifecyclePolicyPreview indicates an expected call of StartLifecyclePolicyPreview
+func (mr *MockECRAPIMockRecorder) StartLifecyclePolicyPreview(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartLifecyclePolicyPreview", reflect.TypeOf((*MockECRAPI)(nil).StartLifecyclePolicyPreview), arg0)
+}
+
+// StartLifecyclePolicyPreviewRequest mocks base method
+func (m *MockECRAPI) StartLifecyclePolicyPreviewRequest(arg0 *ecr.StartLifecyclePolicyPreviewInput) (*request.Request, *ecr.StartLifecyclePolicyPreviewOutput) {
+	ret := m.ctrl.Call(m, "StartLifecyclePolicyPreviewRequest", arg0)
+	ret0, _ := ret[0].(*request.Request)
+	ret1, _ := ret[1].(*ecr.StartLifecyclePolicyPreviewOutput)
+	return ret0, ret1
+}
+
+// StartLifecyclePolicyPreviewRequest indicates an expected call of StartLifecyclePolicyPreviewRequest
+func (mr *MockECRAPIMockRecorder) StartLifecyclePolicyPreviewRequest(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartLifecyclePolicyPreviewRequest", reflect.TypeOf((*MockECRAPI)(nil).StartLifecyclePolicyPreviewRequest), arg0)
+}
+
+// StartLifecyclePolicyPreviewWithContext mocks base method
+func (m *MockECRAPI) StartLifecyclePolicyPreviewWithContext(arg0 aws.Context, arg1 *ecr.StartLifecyclePolicyPreviewInput, arg2 ...request.Option) (*ecr.StartLifecyclePolicyPreviewOutput, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "StartLifecyclePolicyPreviewWithContext", varargs...)
+	ret0, _ := ret[0].(*ecr.StartLifecyclePolicyPreviewOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StartLifecyclePolicyPreviewWithContext indicates an expected call of StartLifecyclePolicyPreviewWithContext
+func (mr *MockECRAPIMockRecorder) StartLifecyclePolicyPreviewWithContext(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartLifecyclePolicyPreviewWithContext", reflect.TypeOf((*MockECRAPI)(nil).StartLifecyclePolicyPreviewWithContext), varargs...)
 }
 
 // UploadLayerPart mocks base method

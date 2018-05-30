@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/base64"
 	"fmt"
+	"log"
 	"math/rand"
 
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -71,8 +72,9 @@ func (d *DynamoTokenManager) DeleteToken(token string) error {
 }
 
 func (d *DynamoTokenManager) Authenticate(user, pass string) (bool, error) {
-	token := convertToToken(user, pass)
+	log.Printf("[DEBUG] Attempting to authenticate user '%s' through DynamoDB", user)
 
+	token := convertToToken(user, pass)
 	key := map[string]*dynamodb.AttributeValue{
 		"Token": {
 			S: &token,
@@ -93,7 +95,13 @@ func (d *DynamoTokenManager) Authenticate(user, pass string) (bool, error) {
 		return false, err
 	}
 
-	return len(output.Item) > 0, nil
+	if len(output.Item) > 0 {
+		log.Printf("[DEBUG] User '%s' sent valid DynamoDB credentials", user)
+		return true, nil
+	}
+
+	log.Printf("[DEBUG] User '%s' sent invalid DynamoDB credentials", user)
+	return false, nil
 }
 
 func convertToToken(user, pass string) string {
