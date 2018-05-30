@@ -31,6 +31,10 @@
                     "name": "DIMSIO_DYNAMO_TABLE",
                     "value": "${dynamo_table}"
                 },
+                {
+                    "name": "DIMSIO_ACCOUNT_TABLE",
+                    "value": "${dynamo_account_table}"
+                },
 		{
                     "name": "DIMSIO_AUTH0_DOMAINN",
                     "value": "${auth0_domain}"
