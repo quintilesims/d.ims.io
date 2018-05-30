@@ -122,7 +122,6 @@ func main() {
 		routes = append(routes, tokenController.Routes()...)
 		routes = append(routes, swaggerController.Routes()...)
 		routes = fireball.Decorate(routes,
-			//controllers.LogDecorator(),
 			controllers.AuthDecorator(authenticator),
 			controllers.LogDecorator())
 
