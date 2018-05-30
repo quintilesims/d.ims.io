@@ -45,7 +45,7 @@ data "template_file" "user_policy" {
 
   vars {
     dynamodb_table_arn         = "${aws_dynamodb_table.dimsio.arn}"
-    dynamodb_account_table_arn = "${aws_dynamodb_table.dimsio.arn}"
+    dynamodb_account_table_arn = "${aws_dynamodb_table.dimsio_account.arn}"
   }
 }
 
