@@ -32,8 +32,8 @@
                     "value": "${dynamo_table}"
                 },
                 {
-                    "name": "DIMSIO_ACCOUNT_TABLE",
-                    "value": "${dynamo_account_table}"
+                    "name": "DIMSIO_REGISTRY_ENDPOINT",
+                    "value": "${registry_endpoint}"
                 },
 		{
                     "name": "DIMSIO_AUTH0_DOMAINN",

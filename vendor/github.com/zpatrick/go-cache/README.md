@@ -13,7 +13,7 @@ It's my attempt to practice some of the patterns/philosophies found in these art
 * [Share Memory By Communicating](https://blog.golang.org/share-memory-by-communicating)
 
 The code is [tested](https://github.com/zpatrick/go-cache/blob/master/cache_test.go), although standard caveats of using `interface{}` apply.  
-Personally, I'd recommend copying this package and replacing `var T interface{}` with whatever type you need to cache. 
+Personally, I'd recommend copying this package and replacing `interface{}` with whatever type you need to cache. 
 I may add code generation in the future to make that process easier. 
 
 ## Example
@@ -33,15 +33,15 @@ func main() {
 	c.ClearEvery(time.Hour)
 	
 	// add some items
-	c.Set("key1", 1)
-	c.Set("key2", 2)
+	c.Add("one", 1)
+	c.Add("two", 2)
 	
 	// add some items that will expire after 5 minutes
-	c.Set("key3", 3, cache.Expire(time.Minute*5))
-	c.Set("key4", 4,  cache.Expire(time.Minute*5))
+	c.Addf("three", 3, time.Minute*5)
+	c.Addf("four", 4, time.Minute*5)
 
-	fmt.Println(c.Get("key1"))
-	fmt.Println(c.Get("key2"))
+	fmt.Println(c.Get("one"))
+	fmt.Println(c.Get("two"))
 	
 	for _, key := range c.Keys() {
 		fmt.Println(key)
@@ -51,9 +51,9 @@ func main() {
 		fmt.Printf("%s: %v", key, val)
 	}
 	
-	c.Delete("key1")
+	c.Delete("one")
 	
-	if val, ok := c.GetOK("key2"); ok {
+	if val, ok := c.Getf("two"); ok {
 		fmt.Println(val)
 	}
 	
