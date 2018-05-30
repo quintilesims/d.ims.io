@@ -22,10 +22,6 @@ variable "s3_bucket_name" {
   default = "d.ims.io-backups"
 }
 
-variable "s3_bucket_name_account" {
-  default = "d.ims.io-account-backups"
-}
-
 variable "iam_user_name" {
   default = "d.ims.io"
 }
@@ -81,8 +77,4 @@ variable "auth0_client_id" {
 
 variable "lambda_function_name" {
   default = "dimsio_backups"
-}
-
-variable "lambda_function_name_account" {
-  default = "dimsio_account_backups"
 }
