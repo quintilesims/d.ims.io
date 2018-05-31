@@ -1,55 +1,63 @@
 {
-    "AWSEBDockerrunVersion": 2,
-    "containerDefinitions": [
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "dimsio",
+      "image": "${docker_image}",
+      "essential": true,
+      "memory": 128,
+      "environment": [
         {
-            "name": "dimsio",
-            "image": "${docker_image}",
-            "essential": true,
-            "memory": 128,
-            "environment": [
-                {
-                    "name": "DIMSIO_PORT",
-                    "value": "80"
-                },
-                {
-                    "name": "DIMSIO_DEBUG",
-                    "value": "${debug}"
-                },                
-                {
-                    "name": "DIMSIO_AWS_ACCESS_KEY",
-                    "value": "${aws_access_key}"
-                },
-                {
-                    "name": "DIMSIO_AWS_SECRET_KEY",
-                    "value": "${aws_secret_key}"
-                },
-                {
-                    "name": "DIMSIO_AWS_REGION",
-                    "value": "${aws_region}"
-                },
-                {
-                    "name": "DIMSIO_DYNAMO_TABLE",
-                    "value": "${dynamo_table}"
-                },
-		{
-                    "name": "DIMSIO_AUTH0_DOMAINN",
-                    "value": "${auth0_domain}"
-                },
-                {
-                    "name": "DIMSIO_AUTH0_CLIENT_ID",
-                    "value": "${auth0_client_id}"
-                },
-                {
-                    "name": "DIMSIO_AUTH0_CONNECTION",
-                    "value": "${auth0_connection}"
-                }
-            ],
-            "portMappings": [
-                {
-                    "hostPort": 80,
-                    "containerPort": 80
-                }
-            ]
+          "name": "DIMSIO_PORT",
+          "value": "80"
+        },
+        {
+          "name": "DIMSIO_DEBUG",
+          "value": "${debug}"
+        },
+        {
+          "name": "DIMSIO_AWS_ACCESS_KEY",
+          "value": "${aws_access_key}"
+        },
+        {
+          "name": "DIMSIO_AWS_SECRET_KEY",
+          "value": "${aws_secret_key}"
+        },
+        {
+          "name": "DIMSIO_AWS_REGION",
+          "value": "${aws_region}"
+        },
+        {
+          "name": "DIMSIO_TOKENS_TABLE",
+          "value": "${tokens_table}"
+        },
+        {
+          "name": "DIMSIO_ACCOUNTS_TABLE",
+          "value": "${accounts_table}"
+        },
+        {
+          "name": "DIMSIO_REGISTRY_ENDPOINT",
+          "value": "${registry_endpoint}"
+        },
+        {
+          "name": "DIMSIO_AUTH0_DOMAINN",
+          "value": "${auth0_domain}"
+        },
+        {
+          "name": "DIMSIO_AUTH0_CLIENT_ID",
+          "value": "${auth0_client_id}"
+        },
+        {
+          "name": "DIMSIO_AUTH0_CONNECTION",
+          "value": "${auth0_connection}"
         }
-    ]
+      ],
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ]
+    }
+  ]
 }
