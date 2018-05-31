@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
-resource "aws_dynamodb_table" "dimsio" {
-  name             = "${var.dynamodb_table_name}"
+resource "aws_dynamodb_table" "tokens" {
+  name             = "${var.tokens_dynamodb_table_name}"
   read_capacity    = "${var.dynamodb_read_capacity}"
   write_capacity   = "${var.dynamodb_write_capacity}"
   stream_enabled   = true
@@ -14,8 +14,8 @@ resource "aws_dynamodb_table" "dimsio" {
   }
 }
 
-resource "aws_dynamodb_table" "dimsio_account" {
-  name           = "${var.dynamodb_account_table_name}"
+resource "aws_dynamodb_table" "accounts" {
+  name           = "${var.accounts_dynamodb_table_name}"
   read_capacity  = "${var.dynamodb_read_capacity}"
   write_capacity = "${var.dynamodb_write_capacity}"
   hash_key       = "AccountID"
@@ -44,7 +44,8 @@ data "template_file" "user_policy" {
   template = "${file("${path.module}/user_policy.json")}"
 
   vars {
-    dynamodb_table_arn = "${aws_dynamodb_table.dimsio.arn}"
+    tokens_table_arn   = "${aws_dynamodb_table.tokens.arn}"
+    accounts_table_arn = "${aws_dynamodb_table.accounts.arn}"
   }
 }
 
@@ -81,23 +82,28 @@ data "template_file" "dimsio" {
   template = "${file("${path.module}/Dockerrun.aws.json")}"
 
   vars {
-    docker_image     = "${var.docker_image}"
-    debug            = "${var.debug ? "true" : "false"}"
-    aws_access_key   = "${aws_iam_access_key.dimsio.id}"
-    aws_secret_key   = "${aws_iam_access_key.dimsio.secret}"
-    aws_region       = "${var.aws_region}"
-    dynamo_table     = "${aws_dynamodb_table.dimsio.name}"
-    auth0_domain     = "${var.auth0_domain}"
-    auth0_client_id  = "${var.auth0_client_id}"
-    auth0_connection = "${var.auth0_connection}"
+    docker_image      = "${var.docker_image}"
+    debug             = "${var.debug ? "true" : "false"}"
+    aws_access_key    = "${aws_iam_access_key.dimsio.id}"
+    aws_secret_key    = "${aws_iam_access_key.dimsio.secret}"
+    aws_region        = "${var.aws_region}"
+    tokens_table      = "${aws_dynamodb_table.tokens.name}"
+    accounts_table    = "${aws_dynamodb_table.accounts.name}"
+    registry_endpoint = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com"
+    auth0_domain      = "${var.auth0_domain}"
+    auth0_client_id   = "${var.auth0_client_id}"
+    auth0_connection  = "${var.auth0_connection}"
   }
 }
 
 module "backup" {
   source                    = "github.com/quintilesims/terraform-ddb-table-backup"
-  dynamodb_table_name       = "${aws_dynamodb_table.dimsio.name}"
-  dynamodb_table_arn        = "${aws_dynamodb_table.dimsio.arn}"
-  dynamodb_table_stream_arn = "${aws_dynamodb_table.dimsio.stream_arn}"
-  backup_s3_bucket_name     = "${var.s3_bucket_name}"
-  lambda_function_name      = "${var.lambda_function_name}"
+  dynamodb_table_name       = "${aws_dynamodb_table.accounts.name}"
+  dynamodb_table_arn        = "${aws_dynamodb_table.accounts.arn}"
+  dynamodb_table_stream_arn = "${aws_dynamodb_table.accounts.stream_arn}"
+  backup_s3_bucket_name     = "${var.backup_s3_bucket_name}"
+  lambda_function_name      = "${var.backup_lambda_function_name}"
 }
+
+# TODO: take S3 bucket out of ddb-table-backup module, use same bucket for accounts table backups 
+

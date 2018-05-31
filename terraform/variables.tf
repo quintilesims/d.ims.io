@@ -1,24 +1,24 @@
-variable "dynamodb_table_name" {
-  default = "d.ims.io"
+variable "tokens_dynamodb_table_name" {
+  default = "d.ims.io-tokens"
 }
 
-variable "dynamodb_account_table_name" {
-  default = "d.ims.io.account"
+variable "accounts_dynamodb_table_name" {
+  default = "d.ims.io-accounts"
 }
 
 variable "dynamodb_read_capacity" {
-  default = 1
+  default = 5
 }
 
 variable "dynamodb_write_capacity" {
-  default = 1
+  default = 5
 }
 
 variable "debug" {
   default = false
 }
 
-variable "s3_bucket_name" {
+variable "backup_s3_bucket_name" {
   default = "d.ims.io-backups"
 }
 
@@ -75,6 +75,6 @@ variable "auth0_client_id" {
   description = "The client id associated with the Auth0 connection"
 }
 
-variable "lambda_function_name" {
+variable "backup_lambda_function_name" {
   default = "dimsio_backups"
 }
