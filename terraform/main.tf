@@ -19,6 +19,8 @@ resource "aws_dynamodb_table" "accounts" {
   read_capacity  = "${var.dynamodb_read_capacity}"
   write_capacity = "${var.dynamodb_write_capacity}"
   hash_key       = "AccountID"
+  stream_enabled   = true
+  stream_view_type = "NEW_IMAGE"
 
   attribute {
     name = "AccountID"
@@ -98,9 +100,9 @@ data "template_file" "dimsio" {
 
 module "backup" {
   source                    = "github.com/quintilesims/terraform-ddb-table-backup"
-  dynamodb_table_name       = "${aws_dynamodb_table.accounts.name}"
-  dynamodb_table_arn        = "${aws_dynamodb_table.accounts.arn}"
-  dynamodb_table_stream_arn = "${aws_dynamodb_table.accounts.stream_arn}"
+  dynamodb_table_name       = "${aws_dynamodb_table.tokens.name}"
+  dynamodb_table_arn        = "${aws_dynamodb_table.tokens.arn}"
+  dynamodb_table_stream_arn = "${aws_dynamodb_table.tokens.stream_arn}"
   backup_s3_bucket_name     = "${var.backup_s3_bucket_name}"
   lambda_function_name      = "${var.backup_lambda_function_name}"
 }
