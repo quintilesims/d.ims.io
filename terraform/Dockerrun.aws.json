@@ -28,8 +28,16 @@
                     "value": "${aws_region}"
                 },
                 {
-                    "name": "DIMSIO_DYNAMO_TABLE",
-                    "value": "${dynamo_table}"
+                    "name": "DIMSIO_TOKENS_TABLE",
+                    "value": "${tokens_table}"
+                },
+                {
+                    "name": "DIMSIO_ACCOUNTS_TABLE",
+                    "value": "${accounts_table}"
+                },
+		{
+                    "name": "DIMSIO_REGISTRY_ENDPOINT",
+                    "value": "${registry_endpoint}"
                 },
 		{
                     "name": "DIMSIO_AUTH0_DOMAINN",
