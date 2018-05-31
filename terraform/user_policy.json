@@ -12,7 +12,10 @@
                         "Action": [
                                 "dynamodb:*"
                         ],
-                        "Resource": "${dynamodb_table_arn}"
+                        "Resource": [
+				"${tokens_table_arn}",
+				"${accounts_table_arn}"
+			]
                 }
 	]
 }

@@ -60,14 +60,18 @@ func main() {
 			EnvVar: config.ENVVAR_AWS_REGION,
 		},
 		cli.StringFlag{
-			Name:   "dynamo-table",
-			Value:  config.DEFAULT_DYNAMO_TABLE,
-			EnvVar: config.ENVVAR_DYNAMO_TABLE,
+			Name:   "tokens-table",
+			Value:  config.DEFAULT_TOKENS_TABLE,
+			EnvVar: config.ENVVAR_TOKENS_TABLE,
 		},
 		cli.StringFlag{
-			Name:   "account-table",
-			Value:  config.DEFAULT_ACCOUNT_TABLE,
-			EnvVar: config.ENVVAR_ACCOUNT_TABLE,
+			Name:   "accounts-table",
+			Value:  config.DEFAULT_ACCOUNTS_TABLE,
+			EnvVar: config.ENVVAR_ACCOUNTS_TABLE,
+		},
+		cli.StringFlag{
+			Name:   "registry-endpoint",
+			EnvVar: config.ENVVAR_REGISTRY_ENDPOINT,
 		},
 		cli.StringFlag{
 			Name:   "auth0-domain",
@@ -98,8 +102,8 @@ func main() {
 		dynamodb := dynamodb.New(session)
 		ecr := ecr.New(session)
 
-		tokenManager := auth.NewDynamoTokenManager(c.String("dynamo-table"), dynamodb)
-		accountManager := auth.NewDynamoAccountManager(c.String("account-table"), dynamodb)
+		tokenManager := auth.NewDynamoTokenManager(c.String("tokens-table"), dynamodb)
+		accountManager := auth.NewDynamoAccountManager(c.String("accounts-table"), dynamodb)
 		auth0Authenticator := auth.NewAuth0Authenticator(
 			c.String("auth0-domain"),
 			c.String("auth0-client-id"),
@@ -148,14 +152,15 @@ func main() {
 
 func validateConfig(c *cli.Context) error {
 	vars := map[string]error{
-		"aws-access-key":   fmt.Errorf("AWS Access Key not set! (EnvVar: %s)", config.ENVVAR_AWS_ACCESS_KEY),
-		"aws-secret-key":   fmt.Errorf("AWS Secret Key not set! (EnvVar: %s)", config.ENVVAR_AWS_SECRET_KEY),
-		"aws-region":       fmt.Errorf("AWS Region not set! (EnvVar: %s)", config.ENVVAR_AWS_REGION),
-		"dynamo-table":     fmt.Errorf("Dynamo Table not set! (EnvVar: %s)", config.ENVVAR_DYNAMO_TABLE),
-		"account-table":    fmt.Errorf("Account Table not set! (EnvVar: %s)", config.ENVVAR_ACCOUNT_TABLE),
-		"auth0-domain":     fmt.Errorf("Auth0 Domain not set! (EnvVar: %s)", config.ENVVAR_AUTH0_DOMAIN),
-		"auth0-client-id":  fmt.Errorf("Auth0 Client ID not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CLIENT_ID),
-		"auth0-connection": fmt.Errorf("Auth0 Connection not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CONNECTION),
+		"aws-access-key":    fmt.Errorf("AWS Access Key not set! (EnvVar: %s)", config.ENVVAR_AWS_ACCESS_KEY),
+		"aws-secret-key":    fmt.Errorf("AWS Secret Key not set! (EnvVar: %s)", config.ENVVAR_AWS_SECRET_KEY),
+		"aws-region":        fmt.Errorf("AWS Region not set! (EnvVar: %s)", config.ENVVAR_AWS_REGION),
+		"tokens-table":      fmt.Errorf("Tokens Table not set! (EnvVar: %s)", config.ENVVAR_TOKENS_TABLE),
+		"accounts-table":    fmt.Errorf("Accounts Table not set! (EnvVar: %s)", config.ENVVAR_ACCOUNTS_TABLE),
+		"registry-endpoint": fmt.Errorf("Registry Endpoint not set! (EnvVar: %s)", config.ENVVAR_REGISTRY_ENDPOINT),
+		"auth0-domain":      fmt.Errorf("Auth0 Domain not set! (EnvVar: %s)", config.ENVVAR_AUTH0_DOMAIN),
+		"auth0-client-id":   fmt.Errorf("Auth0 Client ID not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CLIENT_ID),
+		"auth0-connection":  fmt.Errorf("Auth0 Connection not set! (EnvVar: %s)", config.ENVVAR_AUTH0_CONNECTION),
 	}
 
 	for name, err := range vars {

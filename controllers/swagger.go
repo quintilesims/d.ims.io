@@ -31,7 +31,7 @@ func (s *SwaggerController) serveSwaggerJSON(c *fireball.Context) (fireball.Resp
 	spec := swagger.Spec{
 		SwaggerVersion: "2.0",
 		Host:           c.Request.Host,
-		Schemes:        []string{"https"},
+		Schemes:        []string{"https", "http"},
 		Info: &swagger.Info{
 			Title:   "D.IMS.IO",
 			Version: "1.0.0",
